@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite -m dev --host 0.0.0.0",
-    "build": "vite build -m prod --base=/",
+    "build": "vite build -m prod",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
