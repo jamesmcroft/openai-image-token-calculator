@@ -38,12 +38,16 @@ function App() {
   };
 
   const addNewImage = () => {
-    addImage({ height: "", width: "" });
+    addImage({ height: 0, width: 0, multiplier: 1 });
   };
 
   const cloneImage = (index) => {
     const image = images[index];
-    addImage({ height: image.height, width: image.width });
+    addImage({
+      height: image.height,
+      width: image.width,
+      multiplier: image.multiplier,
+    });
   };
 
   const handleSubmit = (event) => {
@@ -87,7 +91,7 @@ function App() {
               }}
             >
               <TextField
-                label="Image Height (pixels)"
+                label="Image Height (px)"
                 type="number"
                 value={image.height}
                 onChange={(e) => updateImage(index, "height", e.target.value)}
@@ -96,10 +100,21 @@ function App() {
                 style={{ marginRight: "10px" }}
               />
               <TextField
-                label="Image Width (pixels)"
+                label="Image Width (px)"
                 type="number"
                 value={image.width}
                 onChange={(e) => updateImage(index, "width", e.target.value)}
+                margin="normal"
+                required
+                style={{ marginRight: "10px" }}
+              />
+              <TextField
+                label="Count"
+                type="number"
+                value={image.multiplier}
+                onChange={(e) =>
+                  updateImage(index, "multiplier", e.target.value)
+                }
                 margin="normal"
                 required
                 style={{ marginRight: "10px" }}

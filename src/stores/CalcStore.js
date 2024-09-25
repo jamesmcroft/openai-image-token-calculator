@@ -50,13 +50,19 @@ export const calcStore = (set, get) => ({
     const additionalBuffer = model.additionalBuffer;
     const costPerThousandTokens = model.costPerThousandTokens;
 
-    const imageTileCount = images.map((image) => {
+    const imageTileCount = images.flatMap((image) => {
       const imgSize = getResizedImageSize(
         imageMinSizeLength,
         image.height,
         image.width
       );
-      return getImageTileCount(tileSizeLength, imgSize.height, imgSize.width);
+      const imageTiles = getImageTileCount(
+        tileSizeLength,
+        imgSize.height,
+        imgSize.width
+      );
+      const multiplier = image.multiplier;
+      return Array.from({ length: multiplier }, () => imageTiles);
     });
 
     const totalTokens =
