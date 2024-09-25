@@ -15,8 +15,9 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Box,
 } from "@mui/material";
-import { Add, Delete, FileCopy, ExpandMore } from "@mui/icons-material";
+import { Add, Delete, FileCopy } from "@mui/icons-material";
 import { useBoundStore } from "./stores";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
   const updateImage = useBoundStore((state) => state.updateImage);
   const removeImage = useBoundStore((state) => state.removeImage);
   const runCalculation = useBoundStore((state) => state.runCalculation);
+  const resetCalculation = useBoundStore((state) => state.resetCalculation);
   const totalTokens = useBoundStore((state) => state.totalTokens);
   const totalCost = useBoundStore((state) => state.totalCost);
   const model = useBoundStore((state) => state.model);
@@ -39,8 +41,10 @@ function App() {
     const selectedModel = models.find((m) => m.name === model);
     if (selectedModel) {
       setModel(selectedModel);
+      runCalculation();
     } else {
       setModel(null);
+      resetCalculation();
     }
   };
 
@@ -170,17 +174,22 @@ function App() {
               </Button>
             </form>
 
-            {totalTokens !== null && (
-              <Typography gutterBottom>Total Tokens: {totalTokens}</Typography>
-            )}
-            {totalCost !== null && (
-              <Typography gutterBottom>Estimated Cost: ${totalCost}</Typography>
-            )}
+            <Box mt={2}>
+              {totalTokens !== null && (
+                <Typography gutterBottom>
+                  Token Estimate: {totalTokens}
+                </Typography>
+              )}
+              {totalCost !== null && (
+                <Typography gutterBottom>
+                  Cost Estimate: ${totalCost}
+                </Typography>
+              )}
+            </Box>
           </Grid>
           <Grid item xs={12} md={4}>
             <Accordion expanded>
               <AccordionSummary
-                expandIcon={<ExpandMore />}
                 aria-controls="calculation-explanation-content"
                 id="calculation-explanation-header"
               >

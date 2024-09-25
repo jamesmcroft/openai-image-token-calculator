@@ -1,8 +1,8 @@
 export const calcStore = (set, get) => ({
   model: "",
   images: [],
-  totalTokens: 0,
-  totalCost: 0,
+  totalTokens: null,
+  totalCost: null,
 
   setModel: (model) => set({ model }),
 
@@ -17,6 +17,9 @@ export const calcStore = (set, get) => ({
     set({ images: newImages });
   },
 
+  resetCalculation: () => {
+    set(() => ({ totalTokens: null, totalCost: null }));
+  },
   runCalculation: () => {
     function getResizedImageSize(minSize, height, width) {
       let resizedHeight = height;
