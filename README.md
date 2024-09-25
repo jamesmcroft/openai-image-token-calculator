@@ -1,6 +1,6 @@
-# OpenAI Image Token Calculator
+# Azure OpenAI Image Token Calculator
 
-The OpenAI Image Token Calculator is a simple application designed to estimate the number of tokens and the cost associated with processing images using OpenAI's GPT-4o and 4o-mini models. This tool helps users understand the how the tokens and cost is calculated based on the selected model's specifications and the number of images to be processed.
+The Azure OpenAI Image Token Calculator is a simple application designed to estimate the number of tokens and the cost associated with processing images using Azure OpenAI's GPT-4o and 4o-mini models. This tool helps users understand the how the tokens and cost is calculated based on the selected model's specifications and the number of images to be processed.
 
 **Use the app**: https://jamesmcroft.github.io/openai-image-token-calculator/
 

@@ -5,5 +5,6 @@ export default ({}) => {
   return defineConfig({
     plugins: [react()],
     base: "/openai-image-token-calculator/",
+    publicDir: "public",
   });
 };
