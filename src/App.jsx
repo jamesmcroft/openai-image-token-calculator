@@ -10,87 +10,45 @@ import {
   Select,
   InputLabel,
   FormControl,
+  IconButton,
 } from "@mui/material";
+import { Add, Delete, FileCopy } from "@mui/icons-material";
+import { useBoundStore } from "./stores";
 
 function App() {
-  const [model, setModel] = useState("");
-  const [numImages, setNumImages] = useState("");
-  const [imgHeight, setImgHeight] = useState("");
-  const [imgWidth, setImgWidth] = useState("");
-  const [totalTokens, setTotalTokens] = useState(null);
-  const [totalCost, setTotalCost] = useState(null);
+  const [modelName, setModelName] = useState("");
+
+  const images = useBoundStore((state) => state.images);
+  const models = useBoundStore((state) => state.models);
+  const setModel = useBoundStore((state) => state.setModel);
+  const addImage = useBoundStore((state) => state.addImage);
+  const updateImage = useBoundStore((state) => state.updateImage);
+  const removeImage = useBoundStore((state) => state.removeImage);
+  const runCalculation = useBoundStore((state) => state.runCalculation);
+  const totalTokens = useBoundStore((state) => state.totalTokens);
+  const totalCost = useBoundStore((state) => state.totalCost);
+
+  const selectModel = (model) => {
+    setModelName(model);
+
+    const selectedModel = models.find((m) => m.name === model);
+    if (selectedModel) {
+      setModel(selectedModel);
+    }
+  };
+
+  const addNewImage = () => {
+    addImage({ height: "", width: "" });
+  };
+
+  const cloneImage = (index) => {
+    const image = images[index];
+    addImage({ height: image.height, width: image.width });
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    var imgSize = getResizedImageSize(imgHeight, imgWidth);
-    var imageTileCount = getImageTileCount(imgSize.height, imgSize.width);
-
-    var totalTokens = 0;
-    var tokensPerTile = 0;
-    var additionalBuffer = 0;
-    var costPerThousandTokens = 0;
-
-    if (model === "GPT-4o") {
-      tokensPerTile = 170;
-      additionalBuffer = 85;
-      costPerThousandTokens = 0.005;
-    } else if (model === "GPT-4o mini") {
-      tokensPerTile = 5667;
-      additionalBuffer = 2833;
-      costPerThousandTokens = 0.000165;
-    }
-
-    totalTokens = calculateImageTokens(
-      imageTileCount.tilesHigh,
-      imageTileCount.tilesWide,
-      tokensPerTile,
-      numImages,
-      additionalBuffer
-    );
-    setTotalTokens(totalTokens);
-
-    // Round cost to 2 decimal places
-    var totalCost = (totalTokens / 1000) * costPerThousandTokens;
-    totalCost = totalCost.toFixed(2);
-    setTotalCost(totalCost);
-  };
-
-  const getResizedImageSize = (imgHeight, imgWidth) => {
-    var resizedHeight = imgHeight;
-    var resizedWidth = imgWidth;
-
-    if (imgHeight > imgWidth) {
-      resizedHeight = 768;
-    } else {
-      resizedHeight = (imgHeight / imgWidth) * 768;
-    }
-
-    if (imgHeight > imgWidth) {
-      resizedWidth = (imgWidth / imgHeight) * 768;
-    } else {
-      resizedWidth = 768;
-    }
-
-    return { height: resizedHeight, width: resizedWidth };
-  };
-
-  const getImageTileCount = (imgHeight, imgWidth) => {
-    var heightTiles = Math.ceil(imgHeight / 512);
-    var widthTiles = Math.ceil(imgWidth / 512);
-    return { tilesHigh: heightTiles, tilesWide: widthTiles };
-  };
-
-  const calculateImageTokens = (
-    tilesHigh,
-    tilesWide,
-    tokensPerTile,
-    totalImages,
-    additionalBuffer
-  ) => {
-    return (
-      tilesHigh * tilesWide * tokensPerTile * totalImages + additionalBuffer
-    );
+    runCalculation();
   };
 
   return (
@@ -104,45 +62,66 @@ function App() {
             <InputLabel id="model-label">Model</InputLabel>
             <Select
               labelId="model-label"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
+              value={modelName}
+              onChange={(e) => selectModel(e.target.value)}
               label="Model"
             >
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              <MenuItem value="GPT-4o">GPT-4o</MenuItem>
-              <MenuItem value="GPT-4o mini">GPT-4o mini</MenuItem>
+              {models.map((model) => (
+                <MenuItem key={model.name} value={model.name}>
+                  {model.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
-          <TextField
-            label="Number of Images"
-            type="number"
-            value={numImages}
-            onChange={(e) => setNumImages(e.target.value)}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Image Height (pixels)"
-            type="number"
-            value={imgHeight}
-            onChange={(e) => setImgHeight(e.target.value)}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Image Width (pixels)"
-            type="number"
-            value={imgWidth}
-            onChange={(e) => setImgWidth(e.target.value)}
-            fullWidth
-            margin="normal"
-            required
-          />
+          {images.map((image, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <TextField
+                label="Image Height (pixels)"
+                type="number"
+                value={image.height}
+                onChange={(e) => updateImage(index, "height", e.target.value)}
+                margin="normal"
+                required
+                style={{ marginRight: "10px" }}
+              />
+              <TextField
+                label="Image Width (pixels)"
+                type="number"
+                value={image.width}
+                onChange={(e) => updateImage(index, "width", e.target.value)}
+                margin="normal"
+                required
+                style={{ marginRight: "10px" }}
+              />
+              <IconButton onClick={() => cloneImage(index)} color="primary">
+                <FileCopy />
+              </IconButton>
+              <IconButton onClick={() => removeImage(index)} color="secondary">
+                <Delete />
+              </IconButton>
+            </div>
+          ))}
+
+          <Button
+            onClick={addNewImage}
+            variant="contained"
+            color="primary"
+            style={{ marginBottom: "20px" }}
+          >
+            <Add /> Add Image
+          </Button>
+
           <Button type="submit" variant="contained" color="primary" fullWidth>
             Calculate
           </Button>
@@ -154,7 +133,7 @@ function App() {
         )}
         {totalCost !== null && (
           <Typography variant="h6" gutterBottom>
-            Total Cost: ${totalCost}
+            Estimated Cost: ${totalCost}
           </Typography>
         )}
       </Container>
