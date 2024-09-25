@@ -70,7 +70,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Container maxWidth="lg">
         <Typography variant="h4" gutterBottom>
-          OpenAI Image Token Calculator
+          Azure OpenAI Image Token Calculator
         </Typography>
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>

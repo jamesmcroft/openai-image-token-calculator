@@ -1,20 +1,36 @@
 export const modelStore = (set, get) => ({
   models: [
     {
-      name: "GPT-4o",
+      name: "GPT-4o (2024-08-06 - Standard)",
       tokensPerTile: 170,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       additionalBuffer: 85,
-      costPerThousandTokens: 0.005,
+      costPerThousandTokens: 0.00275,
     },
     {
-      name: "GPT-4o mini",
+      name: "GPT-4o (2024-08-06 - Global)",
+      tokensPerTile: 170,
+      imageMinSizeLength: 768,
+      tileSizeLength: 512,
+      additionalBuffer: 85,
+      costPerThousandTokens: 0.0025,
+    },
+    {
+      name: "GPT-4o-mini (2024-07-18)",
       tokensPerTile: 5667,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       additionalBuffer: 2833,
       costPerThousandTokens: 0.000165,
+    },
+    {
+      name: "GPT-4o (2024-05-13)",
+      tokensPerTile: 170,
+      imageMinSizeLength: 768,
+      tileSizeLength: 512,
+      additionalBuffer: 85,
+      costPerThousandTokens: 0.005,
     },
   ],
 });

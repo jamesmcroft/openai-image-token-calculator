@@ -77,6 +77,6 @@ export const calcStore = (set, get) => ({
     set(() => ({ totalTokens: totalTokens }));
 
     const totalCost = (totalTokens / 1000) * costPerThousandTokens;
-    set(() => ({ totalCost: totalCost.toFixed(2) }));
+    set(() => ({ totalCost: totalCost.toFixed(6) }));
   },
 });
