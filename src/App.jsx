@@ -11,7 +11,7 @@ import {
   InputLabel,
   FormControl,
   IconButton,
-  Grid,
+  Grid2 as Grid,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -73,7 +73,7 @@ function App() {
           Azure OpenAI Image Token Calculator
         </Typography>
         <Grid container spacing={4}>
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <form onSubmit={handleSubmit}>
               <FormControl fullWidth margin="normal" required>
                 <InputLabel id="model-label">Model</InputLabel>
@@ -96,7 +96,7 @@ function App() {
 
               {images.map((image, index) => (
                 <Grid container spacing={1} alignItems="center" key={index}>
-                  <Grid item sm={4}>
+                  <Grid size={{ sm: 4 }}>
                     <TextField
                       label="Image Height (px)"
                       type="number"
@@ -109,7 +109,7 @@ function App() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item sm={4}>
+                  <Grid size={{ sm: 4 }}>
                     <TextField
                       label="Image Width (px)"
                       type="number"
@@ -122,7 +122,7 @@ function App() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item sm={2}>
+                  <Grid size={{ sm: 2 }}>
                     <TextField
                       label="Count"
                       type="number"
@@ -135,7 +135,7 @@ function App() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item sm={1}>
+                  <Grid size={{ sm: 1 }}>
                     <IconButton
                       onClick={() => cloneImage(index)}
                       color="primary"
@@ -143,7 +143,7 @@ function App() {
                       <FileCopy />
                     </IconButton>
                   </Grid>
-                  <Grid item sm={1}>
+                  <Grid size={{ sm: 1 }}>
                     <IconButton
                       onClick={() => removeImage(index)}
                       color="secondary"
@@ -175,19 +175,115 @@ function App() {
             </form>
 
             <Box mt={2}>
-              {totalTokens !== null && (
-                <Typography gutterBottom>
-                  Token Estimate: {totalTokens}
-                </Typography>
+              {images.map((image, index) =>
+                image.resizedHeight ? (
+                  <Box key={index} sx={{ display: "flex" }} mb={2}>
+                    <Box sx={{ flex: "1 0 auto" }}>
+                      <Typography variant="h6" gutterBottom>
+                        Image {index + 1}
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Resized Size
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {image.resizedHeight} x {image.resizedWidth}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Tiles (per image)
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {image.tilesHigh} x {image.tilesWide}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Total tiles
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {image.totalTiles}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                ) : null
               )}
-              {totalCost !== null && (
-                <Typography gutterBottom>
-                  Cost Estimate: ${totalCost}
-                </Typography>
+
+              {totalTokens !== null && (
+                <Box sx={{ display: "flex" }} mb={2}>
+                  <Box sx={{ flex: "1 0 auto" }}>
+                    <Typography variant="h6" gutterBottom>
+                      Result
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {model && (
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Base tokens
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {model.baseTokens}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      {model && (
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Tile tokens
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {model.tokensPerTile} x{" "}
+                            {images
+                              .map((image) => image.totalTiles ?? 0)
+                              .reduce((acc, val) => acc + val, 0)}{" "}
+                            = {totalTokens - model.baseTokens}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      {totalTokens !== null && (
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Total tokens
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {totalTokens}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      {totalCost !== null && (
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body2" color="textSecondary">
+                            Total cost
+                          </Typography>
+                          <Typography variant="body1" gutterBottom>
+                            ${totalCost}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
               )}
             </Box>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Accordion expanded>
               <AccordionSummary
                 aria-controls="calculation-explanation-content"
@@ -197,27 +293,27 @@ function App() {
               </AccordionSummary>
               {model ? (
                 <AccordionDetails>
-                  <Typography paragraph>
-                    The calculation involves several steps:
+                  <Typography>
+                    <p>The calculation involves several steps:</p>
                   </Typography>
-                  <Typography paragraph>
+                  <Typography>
                     1. <b>Resizing Images</b>: Ensure each image is resized to
                     fit within the maximum dimension {model.maxImageDimension}
                     px, and has at least {model.imageMinSizeLength}px on the
                     shortest side, while maintaining its aspect ratio.
                   </Typography>
-                  <Typography paragraph>
+                  <Typography>
                     2. <b>Calculating Tiles</b>: The resized image is divided
                     into tiles based on the model's tile size of{" "}
                     {model.tileSizeLength}px by {model.tileSizeLength}px.
                   </Typography>
-                  <Typography paragraph>
+                  <Typography>
                     3. <b>Token Calculation</b>: The total number of tokens is
                     calculated by multiplying the number of tiles by the tokens
                     per tile ({model.tokensPerTile}) and adding an additional
-                    buffer of {model.additionalBuffer} tokens.
+                    buffer of {model.baseTokens} tokens.
                   </Typography>
-                  <Typography paragraph>
+                  <Typography>
                     4. <b>Cost Calculation</b>: The total cost is calculated
                     based on the total number of tokens and the cost per
                     thousand tokens (${model.costPerThousandTokens}).
@@ -225,7 +321,7 @@ function App() {
                 </AccordionDetails>
               ) : (
                 <AccordionDetails>
-                  <Typography paragraph>
+                  <Typography>
                     Please select a model to see the calculation explanation.
                   </Typography>
                 </AccordionDetails>

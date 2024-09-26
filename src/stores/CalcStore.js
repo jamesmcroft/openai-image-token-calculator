@@ -42,6 +42,9 @@ export const calcStore = (set, get) => ({
         resizedHeight = resizedHeight * scaleFactor;
       }
 
+      resizedHeight = Math.round(resizedHeight);
+      resizedWidth = Math.round(resizedWidth);
+
       return { height: resizedHeight, width: resizedWidth };
     }
 
@@ -56,7 +59,7 @@ export const calcStore = (set, get) => ({
     const maxImageDimension = model.maxImageDimension;
     const imageMinSizeLength = model.imageMinSizeLength;
     const tileSizeLength = model.tileSizeLength;
-    const additionalBuffer = model.additionalBuffer;
+    const baseTokens = model.baseTokens;
     const costPerThousandTokens = model.costPerThousandTokens;
 
     const imageTileCount = images.flatMap((image) => {
@@ -66,20 +69,34 @@ export const calcStore = (set, get) => ({
         image.height,
         image.width
       );
+
+      image.resizedHeight = imgSize.height;
+      image.resizedWidth = imgSize.width;
+
       const imageTiles = getImageTileCount(
         tileSizeLength,
         imgSize.height,
         imgSize.width
       );
+
+      image.tilesHigh = imageTiles.tilesHigh;
+      image.tilesWide = imageTiles.tilesWide;
+
       const multiplier = image.multiplier;
+
+      image.totalTiles =
+        imageTiles.tilesHigh * imageTiles.tilesWide * multiplier;
+
       return Array.from({ length: multiplier }, () => imageTiles);
     });
+
+    set(() => ({ images: images }));
 
     const totalTokens =
       imageTileCount.reduce(
         (acc, tiles) => acc + tiles.tilesHigh * tiles.tilesWide * tokensPerTile,
         0
-      ) + additionalBuffer;
+      ) + baseTokens;
 
     set(() => ({ totalTokens: totalTokens }));
 

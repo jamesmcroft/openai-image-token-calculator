@@ -6,7 +6,7 @@ export const modelStore = (set, get) => ({
       maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
-      additionalBuffer: 85,
+      baseTokens: 85,
       costPerThousandTokens: 0.00275,
     },
     {
@@ -15,7 +15,7 @@ export const modelStore = (set, get) => ({
       maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
-      additionalBuffer: 85,
+      baseTokens: 85,
       costPerThousandTokens: 0.0025,
     },
     {
@@ -24,7 +24,7 @@ export const modelStore = (set, get) => ({
       maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
-      additionalBuffer: 2833,
+      baseTokens: 2833,
       costPerThousandTokens: 0.000165,
     },
     {
@@ -33,7 +33,7 @@ export const modelStore = (set, get) => ({
       maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
-      additionalBuffer: 85,
+      baseTokens: 85,
       costPerThousandTokens: 0.005,
     },
   ],
