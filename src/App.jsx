@@ -310,8 +310,8 @@ function App() {
                   <Typography>
                     3. <b>Token Calculation</b>: The total number of tokens is
                     calculated by multiplying the number of tiles by the tokens
-                    per tile ({model.tokensPerTile}) and adding an additional
-                    buffer of {model.baseTokens} tokens.
+                    per tile ({model.tokensPerTile}) and adding{" "}
+                    {model.baseTokens} base tokens.
                   </Typography>
                   <Typography>
                     4. <b>Cost Calculation</b>: The total cost is calculated
