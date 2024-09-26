@@ -201,9 +201,10 @@ function App() {
                     The calculation involves several steps:
                   </Typography>
                   <Typography paragraph>
-                    1. <b>Resizing Images</b>: Each image is resized to a
-                    minimum size while maintaining its aspect ratio. The minimum
-                    size is {model.imageMinSizeLength}px.
+                    1. <b>Resizing Images</b>: Ensure each image is resized to
+                    fit within the maximum dimension {model.maxImageDimension}
+                    px, and has at least {model.imageMinSizeLength}px on the
+                    shortest side, while maintaining its aspect ratio.
                   </Typography>
                   <Typography paragraph>
                     2. <b>Calculating Tiles</b>: The resized image is divided

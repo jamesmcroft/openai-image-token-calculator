@@ -3,6 +3,7 @@ export const modelStore = (set, get) => ({
     {
       name: "GPT-4o (2024-08-06 - Standard)",
       tokensPerTile: 170,
+      maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       additionalBuffer: 85,
@@ -11,6 +12,7 @@ export const modelStore = (set, get) => ({
     {
       name: "GPT-4o (2024-08-06 - Global)",
       tokensPerTile: 170,
+      maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       additionalBuffer: 85,
@@ -19,6 +21,7 @@ export const modelStore = (set, get) => ({
     {
       name: "GPT-4o-mini (2024-07-18)",
       tokensPerTile: 5667,
+      maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       additionalBuffer: 2833,
@@ -27,6 +30,7 @@ export const modelStore = (set, get) => ({
     {
       name: "GPT-4o (2024-05-13)",
       tokensPerTile: 170,
+      maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       additionalBuffer: 85,

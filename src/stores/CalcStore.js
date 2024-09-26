@@ -21,20 +21,25 @@ export const calcStore = (set, get) => ({
     set(() => ({ totalTokens: null, totalCost: null }));
   },
   runCalculation: () => {
-    function getResizedImageSize(minSize, height, width) {
+    function getResizedImageSize(maxDimension, minSide, height, width) {
       let resizedHeight = height;
       let resizedWidth = width;
 
-      if (height > width) {
-        resizedHeight = minSize;
-      } else {
-        resizedHeight = (height / width) * minSize;
+      // Only scale down if larger than maxDimension on any side
+      if (width > maxDimension || height > maxDimension) {
+        const scaleFactor = Math.min(
+          maxDimension / width,
+          maxDimension / height
+        );
+        resizedWidth = width * scaleFactor;
+        resizedHeight = height * scaleFactor;
       }
 
-      if (height > width) {
-        resizedWidth = (width / height) * minSize;
-      } else {
-        resizedWidth = minSize;
+      // If the shortest side is greater than minSide, scale to minSide
+      if (Math.min(resizedWidth, resizedHeight) > minSide) {
+        const scaleFactor = minSide / Math.min(resizedWidth, resizedHeight);
+        resizedWidth = resizedWidth * scaleFactor;
+        resizedHeight = resizedHeight * scaleFactor;
       }
 
       return { height: resizedHeight, width: resizedWidth };
@@ -48,6 +53,7 @@ export const calcStore = (set, get) => ({
 
     const { model, images } = get();
     const tokensPerTile = model.tokensPerTile;
+    const maxImageDimension = model.maxImageDimension;
     const imageMinSizeLength = model.imageMinSizeLength;
     const tileSizeLength = model.tileSizeLength;
     const additionalBuffer = model.additionalBuffer;
@@ -55,6 +61,7 @@ export const calcStore = (set, get) => ({
 
     const imageTileCount = images.flatMap((image) => {
       const imgSize = getResizedImageSize(
+        maxImageDimension,
         imageMinSizeLength,
         image.height,
         image.width
