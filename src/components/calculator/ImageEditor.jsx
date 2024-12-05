@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
   ListSubheader,
+  Typography,
 } from "@mui/material";
 import { Add, Delete, FileCopy } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
@@ -87,7 +88,14 @@ const ImageEditor = () => {
   return (
     <>
       {images.map((image, index) => (
-        <Grid container spacing={1} alignItems="center" key={index}>
+        <Grid
+          container
+          spacing={1}
+          marginBottom={2}
+          alignItems="center"
+          key={index}
+        >
+          <Typography variant="h6">Image {index + 1}</Typography>
           <FormControl fullWidth margin="normal">
             <InputLabel id={`image-preset-${index}`}>Preset</InputLabel>
             <Select

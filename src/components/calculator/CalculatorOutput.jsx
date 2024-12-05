@@ -10,49 +10,6 @@ const CalculatorOutput = () => {
 
   return (
     <Box mt={2}>
-      {images.map((image, index) =>
-        image.resizedHeight ? (
-          <Box key={index} sx={{ display: "flex" }} mb={2}>
-            <Box sx={{ flex: "1 0 auto" }}>
-              <Typography variant="h6" gutterBottom>
-                Image {index + 1}
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="body2" color="textSecondary">
-                    Resized Size
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {image.resizedHeight} x {image.resizedWidth}
-                  </Typography>
-                </Box>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="body2" color="textSecondary">
-                    Tiles (per image)
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {image.tilesHigh} x {image.tilesWide}
-                  </Typography>
-                </Box>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="body2" color="textSecondary">
-                    Total tiles
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {image.totalTiles}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        ) : null
-      )}
-
       {totalTokens !== null && (
         <Box sx={{ display: "flex" }} mb={2}>
           <Box sx={{ flex: "1 0 auto" }}>
@@ -115,6 +72,49 @@ const CalculatorOutput = () => {
             </Box>
           </Box>
         </Box>
+      )}
+
+      {images.map((image, index) =>
+        image.resizedHeight ? (
+          <Box key={index} sx={{ display: "flex" }} mb={2}>
+            <Box sx={{ flex: "1 0 auto" }}>
+              <Typography variant="h6" gutterBottom>
+                Image {index + 1}
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="body2" color="textSecondary">
+                    Resized Size
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {image.resizedHeight} x {image.resizedWidth}
+                  </Typography>
+                </Box>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="body2" color="textSecondary">
+                    Tiles (per image)
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {image.tilesHigh} x {image.tilesWide}
+                  </Typography>
+                </Box>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="body2" color="textSecondary">
+                    Total tiles
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {image.totalTiles}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        ) : null
       )}
     </Box>
   );

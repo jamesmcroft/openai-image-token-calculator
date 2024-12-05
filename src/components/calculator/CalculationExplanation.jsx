@@ -20,9 +20,7 @@ const CalculationExplanation = () => {
       </AccordionSummary>
       {model ? (
         <AccordionDetails>
-          <Typography>
-            <p>The calculation involves several steps:</p>
-          </Typography>
+          <Typography>The calculation involves several steps:</Typography>
           <Typography>
             1. <b>Resizing Images</b>: Ensure each image is resized to fit
             within the maximum dimension {model.maxImageDimension}px, and has at

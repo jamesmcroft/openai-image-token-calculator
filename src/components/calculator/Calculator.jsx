@@ -3,7 +3,6 @@ import { useBoundStore } from "../../stores";
 import ModelSelector from "./ModelSelector";
 import ImageEditor from "./ImageEditor";
 import CalculatorOutput from "./CalculatorOutput";
-import { Button } from "@mui/material";
 
 function Calculator() {
   const [modelName, setModelName] = useState("");
@@ -21,10 +20,6 @@ function Calculator() {
         <ModelSelector modelName={modelName} setModelName={setModelName} />
 
         <ImageEditor />
-
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Calculate
-        </Button>
       </form>
 
       <CalculatorOutput />
