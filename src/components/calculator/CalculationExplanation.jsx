@@ -44,8 +44,7 @@ const CalculationExplanation = () => {
             {model.costPerMillionTokens}).
           </Typography>
           {model.comment && (
-            <Grid>
-              <br />
+            <Grid sx={{ marginTop: 2 }}>
               <Typography>
                 <b>IMPORTANT:</b> {model.comment}
               </Typography>
