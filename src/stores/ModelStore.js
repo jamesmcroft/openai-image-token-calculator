@@ -104,6 +104,15 @@ export const modelStore = (set, get) => ({
       name: "Preview",
       items: [
         {
+          name: "computer-use-preview",
+          tokensPerTile: 129,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 65,
+          costPerMillionTokens: 3,
+        },
+        {
           name: "GPT-4.5-Preview (2025-02-27)",
           tokensPerTile: 170,
           maxImageDimension: 2048,
