@@ -166,6 +166,8 @@ export const modelStore = (set, get) => ({
           tileSizeLength: 512,
           baseTokens: 65,
           costPerMillionTokens: 3,
+          comment:
+            "This calculator only provides the input tokens consumed by the screenshot images processed by the computer-use-preview model, not the entire execution. Images are calculated based on the display width and height defined in the Computer Use tool. The quantity of images will be based on the number of actions the model requires to complete the task.",
         },
         {
           name: "GPT-4.5-Preview (2025-02-27)",
