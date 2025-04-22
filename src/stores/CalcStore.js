@@ -60,7 +60,7 @@ export const calcStore = (set, get) => ({
     const imageMinSizeLength = model.imageMinSizeLength;
     const tileSizeLength = model.tileSizeLength;
     const baseTokens = model.baseTokens;
-    const costPerThousandTokens = model.costPerThousandTokens;
+    const costPerMillionTokens = model.costPerMillionTokens;
 
     const imageTileCount = images.flatMap((image) => {
       const imgSize = getResizedImageSize(
@@ -100,7 +100,7 @@ export const calcStore = (set, get) => ({
 
     set(() => ({ totalTokens: totalTokens }));
 
-    const totalCost = (totalTokens / 1000) * costPerThousandTokens;
+    const totalCost = (totalTokens / 1000000) * costPerMillionTokens;
     set(() => ({ totalCost: totalCost.toFixed(6) }));
   },
 });

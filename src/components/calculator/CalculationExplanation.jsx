@@ -4,6 +4,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
+  Grid2 as Grid,
 } from "@mui/material";
 import { useBoundStore } from "../../stores";
 
@@ -39,9 +40,16 @@ const CalculationExplanation = () => {
           </Typography>
           <Typography>
             4. <b>Cost Calculation</b>: The total cost is calculated based on
-            the total number of tokens and the cost per thousand tokens ($
-            {model.costPerThousandTokens}).
+            the total number of tokens and the cost per million tokens ($
+            {model.costPerMillionTokens}).
           </Typography>
+          {model.comment && (
+            <Grid sx={{ marginTop: 2 }}>
+              <Typography>
+                <b>IMPORTANT:</b> {model.comment}
+              </Typography>
+            </Grid>
+          )}
         </AccordionDetails>
       ) : (
         <AccordionDetails>
