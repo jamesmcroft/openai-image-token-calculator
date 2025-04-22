@@ -3,28 +3,22 @@ import { useBoundStore } from "../../stores";
 import ModelSelector from "./ModelSelector";
 import ImageEditor from "./ImageEditor";
 import CalculatorOutput from "./CalculatorOutput";
+import { Box } from "@mui/material";
 
-function Calculator() {
+export default function Calculator() {
   const [modelName, setModelName] = useState("");
+  const runCalculation = useBoundStore((s) => s.runCalculation);
 
-  const runCalculation = useBoundStore((state) => state.runCalculation);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
     runCalculation();
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <ModelSelector modelName={modelName} setModelName={setModelName} />
-
-        <ImageEditor />
-      </form>
-
+    <Box component="form" onSubmit={handleSubmit} noValidate>
+      <ModelSelector modelName={modelName} setModelName={setModelName} />
+      <ImageEditor />
       <CalculatorOutput />
-    </div>
+    </Box>
   );
 }
-
-export default Calculator;

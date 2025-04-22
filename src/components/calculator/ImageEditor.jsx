@@ -1,199 +1,152 @@
-import React from "react";
 import {
-  TextField,
+  Card,
+  CardContent,
+  Grid,
   IconButton,
-  Grid2 as Grid,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  ListSubheader,
+  TextField,
   Typography,
+  Button,
+  Autocomplete,
+  Stack,
 } from "@mui/material";
 import { Add, Delete, FileCopy } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
 
-const ImageEditor = () => {
-  const images = useBoundStore((state) => state.images);
-  const addImage = useBoundStore((state) => state.addImage);
-  const updateImage = useBoundStore((state) => state.updateImage);
-  const removeImage = useBoundStore((state) => state.removeImage);
-  const presets = useBoundStore((state) => state.presets);
-  const runCalculation = useBoundStore((state) => state.runCalculation);
+export default function ImageEditor() {
+  const images = useBoundStore((s) => s.images);
+  const presets = useBoundStore((s) => s.presets);
+  const addImage = useBoundStore((s) => s.addImage);
+  const updateImage = useBoundStore((s) => s.updateImage);
+  const removeImage = useBoundStore((s) => s.removeImage);
+  const runCalculation = useBoundStore((s) => s.runCalculation);
 
-  const selectPreset = (preset, index) => {
-    updateImage(index, "preset", preset);
+  const presetOptions = presets.flatMap((g) =>
+    g.items.map((p) => ({
+      label: `${p.name}  (${p.height} × ${p.width})`,
+      group: g.name,
+      ...p,
+    }))
+  );
 
-    const selectedPreset = presets
-      .flatMap((presetGroup) =>
-        presetGroup.items.find((p) => p.name === preset)
-      )
-      .filter(Boolean)[0];
-
-    if (selectedPreset) {
-      updateImage(index, "height", selectedPreset.height);
-      updateImage(index, "width", selectedPreset.width);
-    }
-
-    runCalculation();
-  };
-
-  const addNewImage = () => {
-    addImage({ height: 0, width: 0, multiplier: 1, preset: "Custom" });
-
-    runCalculation();
-  };
-
-  const updateExistingImage = (index, field, value) => {
-    updateImage(index, field, value);
-
-    const image = images[index];
-
-    const selectedPreset = presets
-      .flatMap((presetGroup) =>
-        presetGroup.items.find(
-          (p) => p.height == image.height && p.width == image.width
-        )
-      )
-      .filter(Boolean)[0];
-
-    if (selectedPreset) {
-      updateImage(index, "preset", selectedPreset.name);
-    } else {
-      updateImage(index, "preset", "Custom");
-    }
-
-    runCalculation();
-  };
-
-  const cloneExistingImage = (index) => {
-    const image = images[index];
-    addImage({
-      height: image.height,
-      width: image.width,
-      multiplier: image.multiplier,
-      preset: image.preset,
-    });
-
-    runCalculation();
-  };
-
-  const removeExistingImage = (index) => {
-    removeImage(index);
-
-    runCalculation();
-  };
+  const syncCalculation = () => runCalculation();
 
   return (
-    <>
-      {images.map((image, index) => (
-        <Grid
-          container
-          spacing={1}
-          marginBottom={2}
-          alignItems="center"
-          key={index}
-        >
-          <Typography variant="h6">Image {index + 1}</Typography>
-          <FormControl fullWidth margin="normal">
-            <InputLabel id={`image-preset-${index}`}>Preset</InputLabel>
-            <Select
-              labelId={`image-preset-${index}`}
-              value={image.preset}
-              onChange={(e) => selectPreset(e.target.value, index)}
-              label="Preset"
-            >
-              <MenuItem value="Custom">
-                <em>Custom</em>
-              </MenuItem>
-              {presets.flatMap((presetGroup) => [
-                <ListSubheader key={`subheader-${presetGroup.name}`}>
-                  {presetGroup.name}
-                </ListSubheader>,
-                ...presetGroup.items.map((preset) => (
-                  <MenuItem key={preset.name} value={preset.name}>
-                    <Grid container spacing={1} alignItems="center">
-                      {preset.name}
-                      <div style={{ fontSize: "0.8em", fontStyle: "italic" }}>
-                        ({preset.height} x {preset.width})
-                      </div>
-                    </Grid>
-                  </MenuItem>
-                )),
-              ])}
-            </Select>
-          </FormControl>
+    <Stack spacing={2}>
+      {images.map((image, idx) => (
+        <Card key={idx} variant="outlined" sx={{ position: "relative" }}>
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Image {idx + 1}
+                </Typography>
+              </Grid>
 
-          <Grid size={{ sm: 4 }}>
-            <TextField
-              label="Image Height (px)"
-              type="number"
-              value={image.height}
-              onChange={(e) =>
-                updateExistingImage(index, "height", e.target.value)
-              }
-              margin="normal"
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid size={{ sm: 4 }}>
-            <TextField
-              label="Image Width (px)"
-              type="number"
-              value={image.width}
-              onChange={(e) =>
-                updateExistingImage(index, "width", e.target.value)
-              }
-              margin="normal"
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid size={{ sm: 2 }}>
-            <TextField
-              label="Count"
-              type="number"
-              value={image.multiplier}
-              onChange={(e) =>
-                updateExistingImage(index, "multiplier", e.target.value)
-              }
-              margin="normal"
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid size={{ sm: 1 }}>
-            <IconButton
-              onClick={() => cloneExistingImage(index)}
-              color="primary"
-            >
-              <FileCopy />
-            </IconButton>
-          </Grid>
-          <Grid size={{ sm: 1 }}>
-            <IconButton
-              onClick={() => removeExistingImage(index)}
-              color="secondary"
-            >
-              <Delete />
-            </IconButton>
-          </Grid>
-        </Grid>
+              <Grid item xs={12} sm={12} md={6}>
+                <Autocomplete
+                  options={[{ label: "Custom" }, ...presetOptions]}
+                  groupBy={(o) => o.group || ""}
+                  getOptionLabel={(o) => o.label}
+                  isOptionEqualToValue={(o, v) => o.label === v.label}
+                  value={
+                    presetOptions.find((p) => p.label === image.preset) || null
+                  }
+                  onChange={(_, val) => {
+                    if (!val || val.label === "Custom") {
+                      updateImage(idx, "preset", "Custom");
+                      syncCalculation();
+                      return;
+                    }
+                    updateImage(idx, "preset", val.label);
+                    updateImage(idx, "height", val.height);
+                    updateImage(idx, "width", val.width);
+                    syncCalculation();
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Preset" required />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <TextField
+                  label="Height (px)"
+                  type="number"
+                  fullWidth
+                  value={image.height}
+                  onChange={(e) => {
+                    updateImage(idx, "height", +e.target.value);
+                    syncCalculation();
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <TextField
+                  label="Width (px)"
+                  type="number"
+                  fullWidth
+                  value={image.width}
+                  onChange={(e) => {
+                    updateImage(idx, "width", +e.target.value);
+                    syncCalculation();
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <TextField
+                  label="Count"
+                  type="number"
+                  fullWidth
+                  value={image.multiplier}
+                  onChange={(e) => {
+                    updateImage(idx, "multiplier", +e.target.value);
+                    syncCalculation();
+                  }}
+                />
+              </Grid>
+
+              <Grid
+                item
+                xs={6}
+                md={3}
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <IconButton
+                  color="primary"
+                  onClick={() => {
+                    addImage({ ...image });
+                    syncCalculation();
+                  }}
+                >
+                  <FileCopy fontSize="small" />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  onClick={() => {
+                    removeImage(idx);
+                    syncCalculation();
+                  }}
+                >
+                  <Delete fontSize="small" />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
       ))}
 
       <Button
-        onClick={addNewImage}
         variant="contained"
-        color="info"
-        style={{ marginBottom: "20px" }}
-        fullWidth
+        startIcon={<Add />}
+        sx={{ alignSelf: "flex-start" }}
+        onClick={() => {
+          addImage({ height: 0, width: 0, multiplier: 1, preset: "Custom" });
+          syncCalculation();
+        }}
       >
-        <Add /> Add Image
+        Add Image
       </Button>
-    </>
+    </Stack>
   );
-};
-
-export default ImageEditor;
+}

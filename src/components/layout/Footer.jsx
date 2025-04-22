@@ -1,41 +1,36 @@
-import React from "react";
-import { Box, Button, Typography } from "@mui/material";
-import { GitHub, LinkedIn } from "@mui/icons-material";
+import { Box, Button, Typography, Stack } from "@mui/material";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 
-function Footer() {
+export default function Footer() {
   return (
-    <Box mt={4} textAlign="center">
-      <Typography variant="body2">Created by James Croft.</Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          mt: 2,
-          gap: 1,
-        }}
+    <Box textAlign="center">
+      <Typography variant="body2" color="text.secondary">
+        Created by James Croft.
+      </Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={1}
+        mt={2}
+        justifyContent="center"
       >
         <Button
-          fullWidth
+          startIcon={<GitHubIcon />}
           variant="outlined"
-          color="dark"
-          startIcon={<GitHub />}
           href="https://github.com/jamesmcroft/openai-image-token-calculator"
           target="_blank"
         >
-          View Source on GitHub
+          Source on GitHub
         </Button>
         <Button
+          startIcon={<LinkedInIcon />}
           variant="outlined"
-          color="primary"
-          startIcon={<LinkedIn />}
           href="https://www.linkedin.com/in/jmcroft"
           target="_blank"
         >
-          View Profile on LinkedIn
+          LinkedIn
         </Button>
-      </Box>
+      </Stack>
     </Box>
   );
 }
-
-export default Footer;

@@ -1,95 +1,57 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
 let theme = createTheme({
   palette: {
+    mode: "light",
     primary: {
-      main: "#007FFF",
-      light: "#33A1FD",
-      dark: "#0059B2",
-      contrastText: "#FFFFFF",
+      main: "#0078D4",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: "#F25022",
-      light: "#F57C57",
-      dark: "#A83117",
-      contrastText: "#FFFFFF",
-    },
-    error: {
-      main: "#D83B01",
-      light: "#E6603C",
-      dark: "#9A2D01",
-      contrastText: "#FFFFFF",
-    },
-    warning: {
-      main: "#FFB900",
-      light: "#FFCC3D",
-      dark: "#B38300",
-      contrastText: "#000000",
-    },
-    info: {
       main: "#00BCF2",
-      light: "#33C9F5",
-      dark: "#008BB8",
-      contrastText: "#FFFFFF",
-    },
-    success: {
-      main: "#107C10",
-      light: "#45A045",
-      dark: "#085B08",
-      contrastText: "#FFFFFF",
+      contrastText: "#ffffff",
     },
     background: {
       default: "#F3F2F1",
-      paper: "#FFFFFF",
+      paper: "#ffffff",
     },
     text: {
-      primary: "#323130",
+      primary: "#242424",
       secondary: "#605E5C",
-      disabled: "#A19F9D",
+    },
+    error: {
+      main: "#D83B01",
     },
   },
   typography: {
-    h5: {
-      fontWeight: 500,
-      fontSize: 26,
-      letterSpacing: 0.5,
+    fontFamily: ["Segoe UI", "Roboto", "Arial", "sans-serif"].join(","),
+    h6: {
+      fontWeight: 600,
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
   components: {
-    MuiTab: {
+    MuiButton: {
       defaultProps: {
-        disableRipple: true,
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          fontWeight: 600,
+        },
       },
     },
-  },
-  mixins: {
-    toolbar: {
-      minHeight: 48,
+    MuiPaper: {
+      styleOverrides: {
+        rounded: {
+          borderRadius: 12,
+        },
+      },
     },
   },
 });
 
-theme = {
-  ...theme,
-  components: {
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: theme.palette.primary.main,
-        },
-      },
-    },
-    MuiDivider: {
-      styleOverrides: {
-        root: {
-          backgroundColor: theme.palette.secondary.main,
-        },
-      },
-    },
-  },
-};
-
-export default theme;
+export default responsiveFontSizes(theme);

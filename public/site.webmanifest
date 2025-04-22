@@ -1,0 +1,62 @@
+{
+    "name": "AOAI Image Token Calculator",
+    "short_name": "AOAI Calc",
+    "description": "Estimate image tokens and cost for Azure OpenAI multimodal model requests.",
+    "lang": "en-GB",
+    "start_url": "/openai-image-token-calculator/?source=pwa",
+    "scope": "/openai-image-token-calculator/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#F3F2F1",
+    "theme_color": "#0078D4",
+    "icons": [
+        {
+            "src": "/openai-image-token-calculator/images/icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-128x128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-152x152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/openai-image-token-calculator/images/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
