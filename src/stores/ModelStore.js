@@ -1,6 +1,61 @@
 export const modelStore = (set, get) => ({
   models: [
     {
+      name: "GPT-4.1",
+      items: [
+        {
+          name: "GPT-4.1 (2025-04-14 - Global)",
+          tokensPerTile: 170,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 85,
+          costPerMillionTokens: 2,
+        },
+      ],
+    },
+    {
+      name: "o-series",
+      items: [
+        {
+          name: "o3 (2025-04-16)",
+          tokensPerTile: 150,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 75,
+          costPerMillionTokens: 10,
+        },
+        {
+          name: "o1 (2024-12-17 - Global)",
+          tokensPerTile: 150,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 75,
+          costPerMillionTokens: 15,
+        },
+        {
+          name: "o1 (2024-12-17 - Data Zone)",
+          tokensPerTile: 150,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 75,
+          costPerMillionTokens: 16.5,
+        },
+        {
+          name: "o1 (2024-12-17 - Standard)",
+          tokensPerTile: 150,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 75,
+          costPerMillionTokens: 16.5,
+        },
+      ],
+    },
+    {
       name: "GPT-4o",
       items: [
         {
