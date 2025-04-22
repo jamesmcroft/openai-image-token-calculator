@@ -100,5 +100,19 @@ export const modelStore = (set, get) => ({
         },
       ],
     },
+    {
+      name: "Preview",
+      items: [
+        {
+          name: "GPT-4.5-Preview (2025-02-27)",
+          tokensPerTile: 170,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 85,
+          costPerMillionTokens: 75,
+        },
+      ],
+    },
   ],
 });
