@@ -1,5 +1,12 @@
 import React from "react";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  ListSubheader,
+  Grid2 as Grid,
+} from "@mui/material";
 import { useBoundStore } from "../../stores";
 
 const ModelSelector = ({ modelName, setModelName }) => {
@@ -11,7 +18,9 @@ const ModelSelector = ({ modelName, setModelName }) => {
   const selectModel = (model) => {
     setModelName(model);
 
-    const selectedModel = models.find((m) => m.name === model);
+    const selectedModel = models
+      .flatMap((modelGroup) => modelGroup.items.find((m) => m.name === model))
+      .filter(Boolean)[0];
     if (selectedModel) {
       setModel(selectedModel);
       runCalculation();
@@ -33,11 +42,18 @@ const ModelSelector = ({ modelName, setModelName }) => {
         <MenuItem value="">
           <em>None</em>
         </MenuItem>
-        {models.map((model) => (
-          <MenuItem key={model.name} value={model.name}>
-            {model.name}
-          </MenuItem>
-        ))}
+        {models.flatMap((modelGroup) => [
+          <ListSubheader key={`subheader-${modelGroup.name}`}>
+            {modelGroup.name}
+          </ListSubheader>,
+          ...modelGroup.items.map((model) => (
+            <MenuItem key={model.name} value={model.name}>
+              <Grid container spacing={1} alignItems="center">
+                {model.name}
+              </Grid>
+            </MenuItem>
+          )),
+        ])}
       </Select>
     </FormControl>
   );
