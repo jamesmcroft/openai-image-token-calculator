@@ -1,13 +1,40 @@
 export const modelStore = (set, get) => ({
   models: [
     {
+      name: "GPT-4o (2024-11-20 - Standard)",
+      tokensPerTile: 170,
+      maxImageDimension: 2048,
+      imageMinSizeLength: 768,
+      tileSizeLength: 512,
+      baseTokens: 85,
+      costPerMillionTokens: 2.33384,
+    },
+    {
+      name: "GPT-4o (2024-11-20 - Data Zone)",
+      tokensPerTile: 170,
+      maxImageDimension: 2048,
+      imageMinSizeLength: 768,
+      tileSizeLength: 512,
+      baseTokens: 85,
+      costPerMillionTokens: 2.12167,
+    },
+    {
+      name: "GPT-4o (2024-11-20 - Global)",
+      tokensPerTile: 170,
+      maxImageDimension: 2048,
+      imageMinSizeLength: 768,
+      tileSizeLength: 512,
+      baseTokens: 85,
+      costPerMillionTokens: 1.92879,
+    },
+    {
       name: "GPT-4o (2024-08-06 - Standard)",
       tokensPerTile: 170,
       maxImageDimension: 2048,
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 85,
-      costPerThousandTokens: 0.00275,
+      costPerMillionTokens: 2.12167,
     },
     {
       name: "GPT-4o (2024-08-06 - Data Zone)",
@@ -16,7 +43,7 @@ export const modelStore = (set, get) => ({
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 85,
-      costPerThousandTokens: 0.00275,
+      costPerMillionTokens: 2.12167,
     },
     {
       name: "GPT-4o (2024-08-06 - Global)",
@@ -25,7 +52,7 @@ export const modelStore = (set, get) => ({
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 85,
-      costPerThousandTokens: 0.0025,
+      costPerMillionTokens: 1.92879,
     },
     {
       name: "GPT-4o-mini (2024-07-18 - Standard)",
@@ -34,7 +61,7 @@ export const modelStore = (set, get) => ({
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 2833,
-      costPerThousandTokens: 0.000165,
+      costPerMillionTokens: 0.12731,
     },
     {
       name: "GPT-4o-mini (2024-07-18 - Data Zone)",
@@ -43,7 +70,7 @@ export const modelStore = (set, get) => ({
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 2833,
-      costPerThousandTokens: 0.000165,
+      costPerMillionTokens: 0.12731,
     },
     {
       name: "GPT-4o-mini (2024-07-18 - Global)",
@@ -52,7 +79,7 @@ export const modelStore = (set, get) => ({
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 2833,
-      costPerThousandTokens: 0.00015,
+      costPerMillionTokens: 0.11573,
     },
     {
       name: "GPT-4o (2024-05-13)",
@@ -61,7 +88,7 @@ export const modelStore = (set, get) => ({
       imageMinSizeLength: 768,
       tileSizeLength: 512,
       baseTokens: 85,
-      costPerThousandTokens: 0.005,
+      costPerMillionTokens: 3.85758,
     },
   ],
 });

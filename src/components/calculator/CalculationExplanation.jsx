@@ -39,8 +39,8 @@ const CalculationExplanation = () => {
           </Typography>
           <Typography>
             4. <b>Cost Calculation</b>: The total cost is calculated based on
-            the total number of tokens and the cost per thousand tokens ($
-            {model.costPerThousandTokens}).
+            the total number of tokens and the cost per million tokens ($
+            {model.costPerMillionTokens}).
           </Typography>
         </AccordionDetails>
       ) : (
