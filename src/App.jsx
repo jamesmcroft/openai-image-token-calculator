@@ -36,7 +36,7 @@ export default function App() {
 
       <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 } }}>
         <Grid container spacing={isMdUp ? 4 : 2} alignItems="stretch">
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Paper
               elevation={2}
               sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, height: "100%" }}
@@ -45,7 +45,7 @@ export default function App() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Paper
               elevation={2}
               sx={{

@@ -36,13 +36,13 @@ export default function ImageEditor() {
         <Card key={idx} variant="outlined" sx={{ position: "relative" }}>
           <CardContent>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle1" gutterBottom>
                   Image {idx + 1}
                 </Typography>
               </Grid>
 
-              <Grid item xs={12} sm={12} md={6}>
+              <Grid size={{ xs: 12, sm: 12, md: 6 }}>
                 <Autocomplete
                   options={[{ label: "Custom" }, ...presetOptions]}
                   groupBy={(o) => o.group || ""}
@@ -68,7 +68,7 @@ export default function ImageEditor() {
                 />
               </Grid>
 
-              <Grid item xs={6} md={3}>
+              <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
                   label="Height (px)"
                   type="number"
@@ -80,7 +80,7 @@ export default function ImageEditor() {
                   }}
                 />
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
                   label="Width (px)"
                   type="number"
@@ -93,7 +93,7 @@ export default function ImageEditor() {
                 />
               </Grid>
 
-              <Grid item xs={6} md={3}>
+              <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
                   label="Count"
                   type="number"
@@ -107,9 +107,7 @@ export default function ImageEditor() {
               </Grid>
 
               <Grid
-                item
-                xs={6}
-                md={3}
+                size={{ xs: 6, md: 3 }}
                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
                 <IconButton

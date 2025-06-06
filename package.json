@@ -12,20 +12,20 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.2.1",
-    "@mui/material": "^6.2.1",
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
-    "vite": "^6.3.4"
+    "@vitejs/plugin-react": "^4.5.1",
+    "eslint": "^9.28.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "vite": "^6.3.5"
   }
 }
