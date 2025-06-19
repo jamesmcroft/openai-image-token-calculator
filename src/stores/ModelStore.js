@@ -24,7 +24,7 @@ export const modelStore = (set, get) => ({
           imageMinSizeLength: 768,
           tileSizeLength: 512,
           baseTokens: 75,
-          costPerMillionTokens: 10,
+          costPerMillionTokens: 2,
         },
         {
           name: "o1 (2024-12-17 - Global)",
@@ -83,7 +83,7 @@ export const modelStore = (set, get) => ({
           imageMinSizeLength: 768,
           tileSizeLength: 512,
           baseTokens: 85,
-          costPerMillionTokens: 3.025,
+          costPerMillionTokens: 2.75,
         },
         {
           name: "GPT-4o (2024-08-06 - Global)",
