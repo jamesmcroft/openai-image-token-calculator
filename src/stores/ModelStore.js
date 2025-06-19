@@ -156,6 +156,38 @@ export const modelStore = (set, get) => ({
       ],
     },
     {
+      name: "Image Generation",
+      items: [
+        {
+          name: "gpt-image-1 (Global)",
+          tokensPerTile: 129,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 512,
+          tileSizeLength: 512,
+          baseTokens: 65,
+          costPerMillionTokens: 10,
+        },
+        {
+          name: "gpt-image-1 (Data Zone)",
+          tokensPerTile: 129,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 512,
+          tileSizeLength: 512,
+          baseTokens: 65,
+          costPerMillionTokens: 11,
+        },
+        {
+          name: "gpt-image-1 (Standard)",
+          tokensPerTile: 129,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 512,
+          tileSizeLength: 512,
+          baseTokens: 65,
+          costPerMillionTokens: 11,
+        },
+      ],
+    },
+    {
       name: "Preview",
       items: [
         {
