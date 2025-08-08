@@ -8,6 +8,8 @@ import {
   Paper,
   Typography,
   Box,
+  Stack,
+  Chip,
 } from "@mui/material";
 import { useBoundStore } from "../../stores";
 
@@ -19,11 +21,19 @@ export default function CalculatorOutput() {
 
   if (totalTokens === null) return null;
 
+  const currency = new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 5,
+  }).format(Number(totalCost));
+
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h6" gutterBottom>
-        Result
-      </Typography>
+    <Box id="results" sx={{ mt: 4 }}>
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+        <Typography variant="h6">Result</Typography>
+        {model?.name && <Chip size="small" label={model.name} />}
+      </Stack>
       <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
         <Table size="small" aria-label="summary table">
           <TableHead>
@@ -38,14 +48,14 @@ export default function CalculatorOutput() {
             <TableRow>
               <TableCell>{model?.baseTokens}</TableCell>
               <TableCell>
-                {model.tokensPerTile} x{" "}
+                {model.tokensPerTile} ×{" "}
                 {images
                   .map((image) => image.totalTiles ?? 0)
                   .reduce((acc, val) => acc + val, 0)}{" "}
                 = {totalTokens - (model?.baseTokens || 0)}
               </TableCell>
               <TableCell>{totalTokens}</TableCell>
-              <TableCell>$ {totalCost}</TableCell>
+              <TableCell>{currency}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -58,7 +68,7 @@ export default function CalculatorOutput() {
               Image {i + 1}
             </Typography>
             <TableContainer component={Paper} variant="outlined">
-              <Table size="small">
+              <Table size="small" aria-label={`image ${i + 1} breakdown`}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Resized Size</TableCell>

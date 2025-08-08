@@ -19,6 +19,8 @@ export default function Footer() {
           variant="outlined"
           href="https://github.com/jamesmcroft/openai-image-token-calculator"
           target="_blank"
+          aria-label="View source on GitHub"
+          size="small"
         >
           Source on GitHub
         </Button>
@@ -27,6 +29,8 @@ export default function Footer() {
           variant="outlined"
           href="https://www.linkedin.com/in/jmcroft"
           target="_blank"
+          aria-label="Visit LinkedIn profile"
+          size="small"
         >
           LinkedIn
         </Button>

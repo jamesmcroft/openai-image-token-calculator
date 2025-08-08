@@ -3,6 +3,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
+  Stack,
 } from "@mui/material";
 import { useBoundStore } from "../../stores";
 
@@ -10,46 +11,47 @@ export default function CalculationExplanation() {
   const model = useBoundStore((s) => s.model);
 
   return (
-    <Accordion expanded disableGutters elevation={0}>
+    <Accordion
+      expanded
+      disableGutters
+      elevation={0}
+      aria-label="Calculation explanation"
+    >
       <AccordionSummary>
-        <Typography variant="h6">How the Calculation Works</Typography>
+        <Typography variant="h6" fontWeight={700}>
+          How the Calculation Works
+        </Typography>
       </AccordionSummary>
       <AccordionDetails>
         {model ? (
-          <Typography
-            component="div"
-            sx={{ display: "flex", flexDirection: "column", gap: 1 }}
-          >
-            <span>
-              1. <b>Resizing Images</b>: Ensure each image is resized to fit
-              within the maximum dimension {model.maxImageDimension}px and has
-              at least {model.imageMinSizeLength}px on its shortest side while
+          <Stack spacing={1.25} component="ol" sx={{ pl: 2 }}>
+            <Typography component="li">
+              <b>Resizing Images</b>: Ensure each image is resized to fit within
+              the maximum dimension {model.maxImageDimension}px and has at least{" "}
+              {model.imageMinSizeLength}px on its shortest side while
               maintaining its aspect ratio.
-            </span>
-            <span>
-              2. <b>Calculating Tiles</b>: The resized image is divided into
-              tiles based on the model's tile size of {model.tileSizeLength}px ×{" "}
+            </Typography>
+            <Typography component="li">
+              <b>Calculating Tiles</b>: The resized image is divided into tiles
+              based on the model's tile size of {model.tileSizeLength}px ×{" "}
               {model.tileSizeLength}px.
-            </span>
-            <span>
-              3. <b>Token Calculation</b>: Total tokens = (tiles ×
+            </Typography>
+            <Typography component="li">
+              <b>Token Calculation</b>: Total tokens = (tiles ×
               {model.tokensPerTile}) + {model.baseTokens} base tokens.
-            </span>
-            <span>
-              4. <b>Price Calculation</b>: Total price = total tokens × price
-              per 1M tokens ($
-              {model.costPerMillionTokens}).
-            </span>
+            </Typography>
+            <Typography component="li">
+              <b>Price Calculation</b>: Total price = total tokens × price per
+              1M tokens (${model.costPerMillionTokens}).
+            </Typography>
             {model.comment && (
-              <span>
+              <Typography component="li">
                 <b>IMPORTANT:</b> {model.comment}
-              </span>
+              </Typography>
             )}
-          </Typography>
+          </Stack>
         ) : (
-          <Typography>
-            Please select a model to see the calculation explanation.
-          </Typography>
+          <Typography>Pick a model to see the calculation details.</Typography>
         )}
       </AccordionDetails>
     </Accordion>

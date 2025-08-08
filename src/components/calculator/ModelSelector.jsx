@@ -28,9 +28,18 @@ export default function ModelSelector({ modelName, setModelName }) {
         setModel(val.raw);
         runCalculation();
       }}
-      renderInput={(params) => <TextField {...params} label="Model" required />}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Model"
+          placeholder="Search or choose a model…"
+          required
+          helperText="Pick the Azure OpenAI model variant to estimate tokens and cost"
+        />
+      )}
       value={flatModels.find((m) => m.label === modelName) || null}
       sx={{ mb: 2 }}
+      clearOnEscape
     />
   );
 }
