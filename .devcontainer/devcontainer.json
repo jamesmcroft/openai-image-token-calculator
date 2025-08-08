@@ -1,0 +1,59 @@
+{
+  "name": "OpenAI Image Token Calculator",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": "false"
+    },
+    "ghcr.io/devcontainers/features/git-lfs:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "./local-features/dev-tools": "latest"
+  },
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/git",
+    "ghcr.io/devcontainers/features/git-lfs",
+    "ghcr.io/devcontainers/features/github-cli",
+    "./local-features/dev-tools"
+  ],
+  "remoteUser": "node",
+  "containerUser": "node",
+  "forwardPorts": [
+    5173
+  ],
+  "portsAttributes": {
+    "5173": {
+      "label": "Vite dev server",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "containerEnv": {
+    "CHOKIDAR_USEPOLLING": "true",
+    "WATCHPACK_POLLING": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.remotehub",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "github.vscode-pull-request-github",
+        "GitHub.vscode-github-actions",
+        "eamodio.gitlens",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "dsznajder.es7-react-js-snippets",
+        "formulahendry.auto-rename-tag",
+        "formulahendry.auto-close-tag",
+        "christian-kohler.path-intellisense",
+        "christian-kohler.npm-intellisense",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "streetsidesoftware.code-spell-checker",
+        "EditorConfig.EditorConfig",
+        "vitest.explorer",
+        "ms-vscode-remote.vscode-remote-extensionpack"
+      ]
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh"
+}

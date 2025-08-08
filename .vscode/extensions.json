@@ -1,0 +1,22 @@
+{
+  "recommendations": [
+    "GitHub.remotehub",
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "github.vscode-pull-request-github",
+    "GitHub.vscode-github-actions",
+    "eamodio.gitlens",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-close-tag",
+    "christian-kohler.path-intellisense",
+    "christian-kohler.npm-intellisense",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "streetsidesoftware.code-spell-checker",
+    "EditorConfig.EditorConfig",
+    "vitest.explorer",
+    "ms-vscode-remote.vscode-remote-extensionpack"
+  ]
+}
