@@ -1,6 +1,20 @@
 export const modelStore = (set, get) => ({
   models: [
     {
+      name: "GPT-5",
+      items: [
+        {
+          name: "GPT-5 (2025-08-07 - Global)",
+          tokensPerTile: 140,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 70,
+          costPerMillionTokens: 1.25,
+        },
+      ],
+    },
+    {
       name: "GPT-4.1",
       items: [
         {
