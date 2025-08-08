@@ -9,7 +9,6 @@ import {
   Autocomplete,
   Stack,
   Tooltip,
-  Divider,
   Collapse,
 } from "@mui/material";
 import {
@@ -23,7 +22,7 @@ import {
   Visibility,
 } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 
 export default function ImageEditor() {
   const images = useBoundStore((s) => s.images);
@@ -50,6 +49,10 @@ export default function ImageEditor() {
   // Track collapsed cards by index
   const [collapsedSet, setCollapsedSet] = useState(new Set());
 
+  // Focus-on-results coordination
+  const focusingRef = useRef(false);
+  const pendingCloseSetRef = useRef(new Set());
+
   const toggleCollapsed = (i) =>
     setCollapsedSet((prev) => {
       const next = new Set(prev);
@@ -61,9 +64,20 @@ export default function ImageEditor() {
   const collapseAll = () => setCollapsedSet(new Set(images.map((_, i) => i)));
   const expandAll = () => setCollapsedSet(new Set());
   const focusOnResults = () => {
+    // Determine which panels are currently expanded and will close
+    const willClose = images
+      .map((_, i) => i)
+      .filter((i) => !collapsedSet.has(i));
+
+    if (willClose.length === 0) {
+      const el = document.getElementById("results");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    focusingRef.current = true;
+    pendingCloseSetRef.current = new Set(willClose);
     collapseAll();
-    const el = document.getElementById("results");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const syncCalculation = () => runCalculation();
@@ -100,9 +114,9 @@ export default function ImageEditor() {
       {images.map((image, idx) => {
         const isCollapsed = collapsedSet.has(idx);
         const contentId = `image-${idx}-content`;
-        const meta = `${image.height || 0}×${image.width || 0} · ${
-          image.preset || "Custom"
-        } · x${image.multiplier || 1}`;
+        const meta = `${image.multiplier || 1}x · ${image.height || 0}×${
+          image.width || 0
+        }`;
         return (
           <Card key={idx} variant="outlined" sx={{ position: "relative" }}>
             <CardContent>
@@ -186,7 +200,30 @@ export default function ImageEditor() {
                 </Grid>
 
                 <Grid size={{ xs: 12 }} id={contentId}>
-                  <Collapse in={!isCollapsed} timeout="auto" unmountOnExit>
+                  <Collapse
+                    in={!isCollapsed}
+                    timeout="auto"
+                    unmountOnExit
+                    onExited={() => {
+                      if (
+                        focusingRef.current &&
+                        pendingCloseSetRef.current.has(idx)
+                      ) {
+                        pendingCloseSetRef.current.delete(idx);
+                        if (pendingCloseSetRef.current.size === 0) {
+                          focusingRef.current = false;
+                          requestAnimationFrame(() => {
+                            const el = document.getElementById("results");
+                            if (el)
+                              el.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
+                          });
+                        }
+                      }
+                    }}
+                  >
                     <Grid container spacing={2} sx={{ pt: 1 }}>
                       <Grid size={{ xs: 12, sm: 12, md: 6 }}>
                         {/* Preset */}

@@ -29,7 +29,10 @@ export default function CalculatorOutput() {
   }).format(Number(totalCost));
 
   return (
-    <Box id="results" sx={{ mt: 4 }}>
+    <Box
+      id="results"
+      sx={(theme) => ({ mt: 4, scrollMarginTop: `calc(${theme.spacing(10)})` })}
+    >
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
         <Typography variant="h6">Result</Typography>
         {model?.name && <Chip size="small" label={model.name} />}
