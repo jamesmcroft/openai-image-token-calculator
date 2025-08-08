@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Add, Delete, FileCopy } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
+import { useMemo, useState } from "react";
 
 export default function ImageEditor() {
   const images = useBoundStore((s) => s.images);
@@ -28,6 +29,15 @@ export default function ImageEditor() {
     }))
   );
 
+  // Include the Custom option in both options and value lookup
+  const allPresetOptions = useMemo(
+    () => [{ label: "Custom" }, ...presetOptions],
+    [presetOptions]
+  );
+
+  // Control the input text so selecting a value (like "Custom") doesn't filter out other options
+  const [inputValues, setInputValues] = useState({});
+
   const syncCalculation = () => runCalculation();
 
   return (
@@ -44,14 +54,23 @@ export default function ImageEditor() {
 
               <Grid size={{ xs: 12, sm: 12, md: 6 }}>
                 <Autocomplete
-                  options={[{ label: "Custom" }, ...presetOptions]}
+                  options={allPresetOptions}
                   groupBy={(o) => o.group || ""}
                   getOptionLabel={(o) => o.label}
                   isOptionEqualToValue={(o, v) => o.label === v.label}
                   value={
-                    presetOptions.find((p) => p.label === image.preset) || null
+                    allPresetOptions.find((p) => p.label === image.preset) ||
+                    (image.preset ? { label: image.preset } : null)
                   }
+                  inputValue={inputValues[idx] ?? ""}
+                  onInputChange={(_, newInput) =>
+                    setInputValues((s) => ({ ...s, [idx]: newInput }))
+                  }
+                  onOpen={() => setInputValues((s) => ({ ...s, [idx]: "" }))}
                   onChange={(_, val) => {
+                    // Clear the input text so the dropdown shows all options next time
+                    setInputValues((s) => ({ ...s, [idx]: "" }));
+
                     if (!val || val.label === "Custom") {
                       updateImage(idx, "preset", "Custom");
                       syncCalculation();
@@ -75,7 +94,13 @@ export default function ImageEditor() {
                   fullWidth
                   value={image.height}
                   onChange={(e) => {
-                    updateImage(idx, "height", +e.target.value);
+                    const newHeight = +e.target.value;
+                    const newWidth = image.width;
+                    const match = presetOptions.find(
+                      (p) => p.height === newHeight && p.width === newWidth
+                    );
+                    updateImage(idx, "height", newHeight);
+                    updateImage(idx, "preset", match ? match.label : "Custom");
                     syncCalculation();
                   }}
                 />
@@ -87,7 +112,13 @@ export default function ImageEditor() {
                   fullWidth
                   value={image.width}
                   onChange={(e) => {
-                    updateImage(idx, "width", +e.target.value);
+                    const newWidth = +e.target.value;
+                    const newHeight = image.height;
+                    const match = presetOptions.find(
+                      (p) => p.height === newHeight && p.width === newWidth
+                    );
+                    updateImage(idx, "width", newWidth);
+                    updateImage(idx, "preset", match ? match.label : "Custom");
                     syncCalculation();
                   }}
                 />
