@@ -24,6 +24,52 @@ export const modelStore = (set, get) => ({
       ],
     },
     {
+      name: "GPT-5.1",
+      items: [
+        {
+          name: "GPT-5.1 (Global)",
+          tokensPerTile: 140,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 70,
+          costPerMillionTokens: 1.25,
+        },
+        {
+          name: "GPT-5.1 (Data Zone)",
+          tokensPerTile: 140,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 70,
+          costPerMillionTokens: 1.375,
+        },
+      ],
+    },
+    {
+      name: "GPT-5.2",
+      items: [
+        {
+          name: "GPT-5.2 (Global)",
+          tokensPerTile: 140,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 70,
+          costPerMillionTokens: 1.75,
+        },
+        {
+          name: "GPT-5.2 (Data Zone)",
+          tokensPerTile: 140,
+          maxImageDimension: 2048,
+          imageMinSizeLength: 768,
+          tileSizeLength: 512,
+          baseTokens: 70,
+          costPerMillionTokens: 1.925,
+        },
+      ],
+    },
+    {
       name: "GPT-4.1",
       items: [
         {
