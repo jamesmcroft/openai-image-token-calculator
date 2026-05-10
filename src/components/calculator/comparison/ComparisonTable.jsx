@@ -11,6 +11,7 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
+import { CompareArrowsOutlined } from "@mui/icons-material";
 import { useBoundStore } from "../../../stores";
 import ComparisonRow from "./ComparisonRow";
 
@@ -21,7 +22,16 @@ export default function ComparisonTable() {
   const sortOrder = useBoundStore((s) => s.comparisonSortOrder);
   const toggleSort = useBoundStore((s) => s.toggleComparisonSortOrder);
 
-  if (comparisonResults.length === 0) return null;
+  if (comparisonResults.length === 0) {
+    return (
+      <Box sx={{ mt: 4, textAlign: "center", py: 6, opacity: 0.5 }}>
+        <CompareArrowsOutlined sx={{ fontSize: 48, mb: 1, color: "text.secondary" }} />
+        <Typography variant="body2" color="text.secondary">
+          Select models and add images to compare results
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box id="results" sx={(theme) => ({ mt: 4, scrollMarginTop: `calc(${theme.spacing(10)})` })}>
