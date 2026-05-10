@@ -10,6 +10,7 @@ on:
       - package.json
       - package-lock.json
       - vite.config.js
+      - eslint.config.js
       - .github/workflows/ci.yml
   pull_request:
     branches: ["main"]
@@ -20,14 +21,9 @@ on:
       - package.json
       - package-lock.json
       - vite.config.js
+      - eslint.config.js
       - .github/workflows/ci.yml
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-  pull-requests: write
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -36,6 +32,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -76,6 +75,9 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

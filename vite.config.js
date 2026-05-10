@@ -12,6 +12,7 @@ export default ({ mode }) => {
         provider: "v8",
         reporter: ["text", "cobertura"],
         include: ["src/**"],
+        exclude: ["src/**/__tests__/**", "src/**/*.test.*"],
       },
     },
     server: {
