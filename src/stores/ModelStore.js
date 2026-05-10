@@ -1,4 +1,4 @@
-export const modelStore = (set, get) => ({
+export const modelStore = (_set, _get) => ({
   models: [
     {
       name: "GPT-5.5",

@@ -1,4 +1,4 @@
-export const presetStore = (set, get) => ({
+export const presetStore = (_set, _get) => ({
   presets: [
     {
       name: "Print",
