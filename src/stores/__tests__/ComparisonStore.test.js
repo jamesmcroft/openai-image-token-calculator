@@ -8,6 +8,7 @@ function resetStore() {
     selectedModels: [],
     comparisonResults: [],
     expandedModelName: null,
+    comparisonSortOrder: "asc",
     images: [],
     model: "",
     imageResults: [],
@@ -72,6 +73,72 @@ describe("ComparisonStore", () => {
       expect(state.comparisonMode).toBe(false);
       expect(state.selectedModels).toEqual([]);
       expect(state.comparisonResults).toEqual([]);
+    });
+
+    it("carries the single model into selectedModels when entering comparison mode", () => {
+      useBoundStore.setState({ model: tileModel });
+      useBoundStore.getState().setComparisonMode(true);
+      const state = useBoundStore.getState();
+      expect(state.comparisonMode).toBe(true);
+      expect(state.selectedModels).toHaveLength(1);
+      expect(state.selectedModels[0].name).toBe(tileModel.name);
+    });
+
+    it("does not carry over when there is no single model selected", () => {
+      useBoundStore.setState({ model: "" });
+      useBoundStore.getState().setComparisonMode(true);
+      expect(useBoundStore.getState().selectedModels).toHaveLength(0);
+    });
+
+    it("restores the cheapest model as the single model when leaving comparison mode", () => {
+      const s = useBoundStore.getState();
+      s.setComparisonMode(true);
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(patchModelCheap);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+
+      // The cheapest should be patchModelCheap (costPerMillionTokens: 0.75)
+      useBoundStore.getState().setComparisonMode(false);
+      const state = useBoundStore.getState();
+      expect(state.comparisonMode).toBe(false);
+      expect(state.model.name).toBe(patchModelCheap.name);
+    });
+
+    it("restores the first selected model when leaving comparison mode with no results", () => {
+      const s = useBoundStore.getState();
+      s.setComparisonMode(true);
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(tileModel);
+      // No images, so no results
+
+      useBoundStore.getState().setComparisonMode(false);
+      const state = useBoundStore.getState();
+      expect(state.model.name).toBe(patchModelExpensive.name);
+    });
+
+    it("leaves model empty when leaving comparison mode with nothing selected", () => {
+      useBoundStore.getState().setComparisonMode(true);
+      // Nothing selected, no results
+      useBoundStore.getState().setComparisonMode(false);
+      expect(useBoundStore.getState().model).toBe("");
+    });
+
+    it("resets sort order when switching modes", () => {
+      const s = useBoundStore.getState();
+      s.setComparisonMode(true);
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(patchModelCheap);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+      s.toggleComparisonSortOrder();
+      expect(useBoundStore.getState().comparisonSortOrder).toBe("desc");
+
+      useBoundStore.getState().setComparisonMode(false);
+      expect(useBoundStore.getState().comparisonSortOrder).toBe("asc");
+
+      useBoundStore.getState().setComparisonMode(true);
+      expect(useBoundStore.getState().comparisonSortOrder).toBe("asc");
     });
   });
 
@@ -225,6 +292,66 @@ describe("ComparisonStore", () => {
       s.setExpandedModel("GPT-5 (Global)");
       s.setExpandedModel("GPT-5 (Global)");
       expect(useBoundStore.getState().expandedModelName).toBeNull();
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // toggleComparisonSortOrder
+  // -----------------------------------------------------------------------
+
+  describe("toggleComparisonSortOrder", () => {
+    it("defaults to ascending sort order", () => {
+      expect(useBoundStore.getState().comparisonSortOrder).toBe("asc");
+    });
+
+    it("toggles from ascending to descending", () => {
+      const s = useBoundStore.getState();
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(patchModelCheap);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+
+      useBoundStore.getState().toggleComparisonSortOrder();
+      const state = useBoundStore.getState();
+      expect(state.comparisonSortOrder).toBe("desc");
+      // Most expensive should be first
+      expect(Number(state.comparisonResults[0].totalCost)).toBeGreaterThanOrEqual(
+        Number(state.comparisonResults[1].totalCost)
+      );
+    });
+
+    it("toggles back from descending to ascending", () => {
+      const s = useBoundStore.getState();
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(patchModelCheap);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+
+      useBoundStore.getState().toggleComparisonSortOrder();
+      useBoundStore.getState().toggleComparisonSortOrder();
+      const state = useBoundStore.getState();
+      expect(state.comparisonSortOrder).toBe("asc");
+      expect(Number(state.comparisonResults[0].totalCost)).toBeLessThanOrEqual(
+        Number(state.comparisonResults[1].totalCost)
+      );
+    });
+
+    it("preserves sort order across runComparison calls", () => {
+      const s = useBoundStore.getState();
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(patchModelCheap);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+      s.toggleComparisonSortOrder();
+      expect(useBoundStore.getState().comparisonSortOrder).toBe("desc");
+
+      // Re-run comparison (simulates image change)
+      useBoundStore.getState().runComparison();
+      const state = useBoundStore.getState();
+      expect(state.comparisonSortOrder).toBe("desc");
+      expect(Number(state.comparisonResults[0].totalCost)).toBeGreaterThanOrEqual(
+        Number(state.comparisonResults[1].totalCost)
+      );
     });
   });
 });

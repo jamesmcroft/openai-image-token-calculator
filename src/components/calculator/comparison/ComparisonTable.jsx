@@ -6,6 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Paper,
   Typography,
   Stack,
@@ -17,6 +18,8 @@ export default function ComparisonTable() {
   const comparisonResults = useBoundStore((s) => s.comparisonResults);
   const expandedModelName = useBoundStore((s) => s.expandedModelName);
   const setExpandedModel = useBoundStore((s) => s.setExpandedModel);
+  const sortOrder = useBoundStore((s) => s.comparisonSortOrder);
+  const toggleSort = useBoundStore((s) => s.toggleComparisonSortOrder);
 
   if (comparisonResults.length === 0) return null;
 
@@ -25,8 +28,8 @@ export default function ComparisonTable() {
       <Stack spacing={1} sx={{ mb: 2 }}>
         <Typography variant="h6">Comparison Results</Typography>
         <Typography variant="body2" color="text.secondary">
-          Sorted by estimated cost (cheapest first). Click a row to see
-          per-image details.
+          Click the Estimated Cost header to toggle sort order. Click a row to
+          see per-image details.
         </Typography>
       </Stack>
       <TableContainer component={Paper} variant="outlined">
@@ -36,7 +39,15 @@ export default function ComparisonTable() {
               <TableCell>Model</TableCell>
               <TableCell>Tokenization</TableCell>
               <TableCell align="right">Total Tokens</TableCell>
-              <TableCell align="right">Estimated Cost</TableCell>
+              <TableCell align="right" sortDirection={sortOrder}>
+                <TableSortLabel
+                  active
+                  direction={sortOrder}
+                  onClick={toggleSort}
+                >
+                  Estimated Cost
+                </TableSortLabel>
+              </TableCell>
               <TableCell>Retirement</TableCell>
             </TableRow>
           </TableHead>

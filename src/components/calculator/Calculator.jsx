@@ -49,8 +49,16 @@ export default function Calculator() {
             size="small"
             onChange={(_, val) => {
               if (val === null) return;
-              setComparisonMode(val === "compare");
-              setModelName("");
+              const entering = val === "compare";
+              setComparisonMode(entering);
+              if (entering) {
+                // modelName stays as-is for UI; the store carries it into selectedModels
+                setModelName("");
+              } else {
+                // Read back the model the store picked when leaving comparison mode
+                const restored = useBoundStore.getState().model;
+                setModelName(restored?.name ?? "");
+              }
             }}
             aria-label="Calculator mode"
           >
