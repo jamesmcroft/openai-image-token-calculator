@@ -38,9 +38,9 @@ export default function Calculator() {
           alignItems="center"
           justifyContent="space-between"
           flexWrap="wrap"
-          gap={1}
+          gap={2}
         >
-          <Typography variant="h5" fontWeight={700}>
+          <Typography variant="h5" fontWeight={700} sx={{ mr: "auto" }}>
             Configure your calculation
           </Typography>
           <ToggleButtonGroup
