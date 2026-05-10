@@ -105,6 +105,24 @@ describe("ComparisonStore", () => {
       expect(state.model.name).toBe(patchModelCheap.name);
     });
 
+    it("restores the cheapest model even when sort order is descending", () => {
+      const s = useBoundStore.getState();
+      s.setComparisonMode(true);
+      s.toggleModelSelection(patchModelExpensive);
+      s.toggleModelSelection(patchModelCheap);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+      // Flip to descending so [0] is the most expensive
+      s.toggleComparisonSortOrder();
+      expect(useBoundStore.getState().comparisonResults[0].model.name).toBe(
+        patchModelExpensive.name
+      );
+
+      useBoundStore.getState().setComparisonMode(false);
+      // Should still pick the cheapest, not the first in display order
+      expect(useBoundStore.getState().model.name).toBe(patchModelCheap.name);
+    });
+
     it("restores the first selected model when leaving comparison mode with no results", () => {
       const s = useBoundStore.getState();
       s.setComparisonMode(true);
@@ -139,6 +157,46 @@ describe("ComparisonStore", () => {
 
       useBoundStore.getState().setComparisonMode(true);
       expect(useBoundStore.getState().comparisonSortOrder).toBe("asc");
+    });
+
+    it("auto-runs comparison when entering comparison mode with a model and images", () => {
+      useBoundStore.setState({ model: tileModel });
+      useBoundStore.getState().addImage({ height: 1024, width: 1024, multiplier: 1 });
+      useBoundStore.getState().setComparisonMode(true);
+      const state = useBoundStore.getState();
+      expect(state.comparisonResults).toHaveLength(1);
+      expect(state.comparisonResults[0].model.name).toBe(tileModel.name);
+      expect(state.comparisonResults[0].totalTokens).toBeGreaterThan(0);
+    });
+
+    it("does not auto-run comparison when entering with no images", () => {
+      useBoundStore.setState({ model: tileModel });
+      useBoundStore.getState().setComparisonMode(true);
+      expect(useBoundStore.getState().comparisonResults).toHaveLength(0);
+    });
+
+    it("auto-runs single calculation when leaving comparison mode with a restored model and images", () => {
+      const s = useBoundStore.getState();
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.setComparisonMode(true);
+      s.toggleModelSelection(patchModelCheap);
+      s.runComparison();
+
+      useBoundStore.getState().setComparisonMode(false);
+      const state = useBoundStore.getState();
+      expect(state.model.name).toBe(patchModelCheap.name);
+      expect(state.totalTokens).toBeGreaterThan(0);
+      expect(state.totalCost).not.toBeNull();
+    });
+
+    it("resets single calculation when leaving comparison mode with no model", () => {
+      const s = useBoundStore.getState();
+      s.setComparisonMode(true);
+      // No models selected
+      useBoundStore.getState().setComparisonMode(false);
+      const state = useBoundStore.getState();
+      expect(state.totalTokens).toBeNull();
+      expect(state.totalCost).toBeNull();
     });
   });
 
@@ -240,6 +298,22 @@ describe("ComparisonStore", () => {
       s.toggleModelSelection(tileModel);
       s.runComparison();
       expect(useBoundStore.getState().comparisonResults).toEqual([]);
+    });
+
+    it("resets expandedModelName when results are cleared", () => {
+      const s = useBoundStore.getState();
+      s.toggleModelSelection(tileModel);
+      s.addImage({ height: 1024, width: 1024, multiplier: 1 });
+      s.runComparison();
+      s.setExpandedModel(tileModel.name);
+      expect(useBoundStore.getState().expandedModelName).toBe(tileModel.name);
+
+      // Remove all images so runComparison clears results
+      useBoundStore.setState({ images: [] });
+      useBoundStore.getState().runComparison();
+      const state = useBoundStore.getState();
+      expect(state.comparisonResults).toEqual([]);
+      expect(state.expandedModelName).toBeNull();
     });
 
     it("recalculates when images change", () => {

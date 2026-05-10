@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -104,6 +104,26 @@ function ImageBreakdownList({ imageResults, isPatch }) {
   const [collapsedSet, setCollapsedSet] = useState(() =>
     defaultCollapsed ? new Set(validResults.map(({ idx }) => idx)) : new Set()
   );
+
+  // Reconcile when the set of valid images changes
+  const validIndices = validResults.map(({ idx }) => idx);
+  useEffect(() => {
+    setCollapsedSet((prev) => {
+      const validSet = new Set(validIndices);
+      // Remove indices that no longer exist
+      const pruned = new Set([...prev].filter((i) => validSet.has(i)));
+      // If we crossed the 3+ threshold, collapse any new entries
+      if (validIndices.length >= 3) {
+        for (const idx of validIndices) {
+          if (!pruned.has(idx) && !prev.has(idx)) {
+            // Truly new index (was not in prev at all, not just pruned)
+            pruned.add(idx);
+          }
+        }
+      }
+      return pruned;
+    });
+  }, [validIndices.join(",")]);
 
   const toggle = (i) =>
     setCollapsedSet((prev) => {

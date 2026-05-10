@@ -2,12 +2,12 @@ import {
   Autocomplete,
   Box,
   Checkbox,
-  Chip,
   TextField,
   Typography,
 } from "@mui/material";
 import { CheckBoxOutlineBlank, CheckBox } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
+import RetirementChip from "./comparison/RetirementChip";
 
 export default function ModelSelector({ modelName, setModelName }) {
   const models = useBoundStore((s) => s.models);
@@ -71,15 +71,7 @@ export default function ModelSelector({ modelName, setModelName }) {
               <Typography variant="body2" noWrap>
                 {option.label}
               </Typography>
-              {option.raw.retirementDate && (
-                <Chip
-                  label={`Retires ${option.raw.retirementDate}`}
-                  size="small"
-                  color="warning"
-                  variant="outlined"
-                  sx={{ ml: "auto", flexShrink: 0 }}
-                />
-              )}
+              <RetirementChip date={option.raw.retirementDate} sx={{ ml: "auto" }} />
             </Box>
           );
         }}
@@ -127,15 +119,7 @@ export default function ModelSelector({ modelName, setModelName }) {
           <Typography variant="body2" noWrap>
             {option.label}
           </Typography>
-          {option.raw.retirementDate && (
-            <Chip
-              label={`Retires ${option.raw.retirementDate}`}
-              size="small"
-              color="warning"
-              variant="outlined"
-              sx={{ ml: "auto", flexShrink: 0 }}
-            />
-          )}
+          <RetirementChip date={option.raw.retirementDate} sx={{ ml: "auto" }} />
         </Box>
       )}
       renderInput={(params) => (

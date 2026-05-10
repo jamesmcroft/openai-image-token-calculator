@@ -15,11 +15,21 @@ export default function ComparisonRow({ result, isExpanded, onToggle }) {
   const { model, totalTokens, totalCost } = result;
   const tokenizationType = model.tokenizationType === "patch" ? "Patch" : "Tile";
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
     <>
       <TableRow
         hover
         onClick={onToggle}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
         sx={{ cursor: "pointer", "& > *": { borderBottom: isExpanded ? 0 : undefined } }}
         aria-expanded={isExpanded}
       >

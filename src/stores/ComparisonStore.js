@@ -21,12 +21,18 @@ export const comparisonStore = (set, get) => ({
         expandedModelName: null,
         comparisonSortOrder: "asc",
       });
+      // Auto-calculate if there are images and a carried-over model
+      if (carryOver.length > 0 && state.images.length > 0) {
+        get().runComparison();
+      }
     } else {
-      // Compare -> Single: pick the cheapest result or the first selected model
-      const cheapest =
-        state.comparisonResults.length > 0
-          ? state.comparisonResults[0].model
-          : state.selectedModels[0] ?? null;
+      // Compare -> Single: find the actual cheapest regardless of display sort
+      let cheapest = state.selectedModels[0] ?? null;
+      if (state.comparisonResults.length > 0) {
+        cheapest = state.comparisonResults.reduce((min, r) =>
+          Number(r.totalCost) < Number(min.totalCost) ? r : min
+        ).model;
+      }
       set({
         comparisonMode: false,
         selectedModels: [],
@@ -35,6 +41,12 @@ export const comparisonStore = (set, get) => ({
         comparisonSortOrder: "asc",
         model: cheapest ?? "",
       });
+      // Auto-calculate single-mode results for the restored model
+      if (cheapest && state.images.length > 0) {
+        get().runCalculation();
+      } else {
+        get().resetCalculation();
+      }
     }
   },
 
@@ -65,7 +77,7 @@ export const comparisonStore = (set, get) => ({
   runComparison: () => {
     const { selectedModels, images, comparisonSortOrder } = get();
     if (selectedModels.length === 0 || images.length === 0) {
-      set({ comparisonResults: [] });
+      set({ comparisonResults: [], expandedModelName: null });
       return;
     }
 
