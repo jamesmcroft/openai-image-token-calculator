@@ -7,6 +7,14 @@ export default ({ mode }) => {
     // Use GitHub Pages base only for production builds
     base: "/openai-image-token-calculator/",
     publicDir: "public",
+    test: {
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "cobertura"],
+        include: ["src/**"],
+        exclude: ["src/**/__tests__/**", "src/**/*.test.*"],
+      },
+    },
     server: {
       host: true, // equivalent to 0.0.0.0
       port: 5173,

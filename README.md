@@ -1,5 +1,7 @@
 # Azure OpenAI Image Token Calculator
 
+[![CI](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/ci.yml)
+
 The Azure OpenAI Image Token Calculator is a simple application designed to estimate the number of tokens and the cost associated with processing images using Azure OpenAI's multimodal models, such as GPT-5, GPT-4.1, o-series, GPT-4o, and Computer Use. This tool helps users understand the how the tokens and cost is calculated based on the selected model's specifications and the number of images to be processed.
 
 **Use the app**: https://jamesmcroft.github.io/openai-image-token-calculator/
@@ -50,18 +52,26 @@ npm run build
 
 This will create a `dist` directory containing the compiled application.
 
-## Contributing
+## Contributing 🤝🏻
 
-Contributions are welcome! To contribute changes to the application:
+Contributions, issues and feature requests are welcome!
 
-1. Fork the repository.
-2. Clone your forked repository.
-3. Create a new branch for your changes.
-4. Make your changes.
-5. Commit your changes.
-6. Push your changes to your forked repository.
-7. Create a pull request!
+Feel free to check the [issues page](https://github.com/jamesmcroft/openai-image-token-calculator/issues). You can also take a look at the [contributing guide](https://github.com/jamesmcroft/openai-image-token-calculator/blob/main/CONTRIBUTING.md).
+
+We actively encourage you to jump in and help with any issues, and if you find one, don't forget to log it!
+
+## Support this project 💗
+
+As many developers know, projects like this are built and maintained in maintainers' spare time. If you find this project useful, please **Star** the repo.
+
+## Author
+
+👤 **James Croft**
+
+* Website: <https://www.jamescroft.co.uk>
+* GitHub: [@jamesmcroft](https://github.com/jamesmcroft)
+* LinkedIn: [@jmcroft](https://linkedin.com/in/jmcroft)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is made available under the terms and conditions of the [MIT license](LICENSE).

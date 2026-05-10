@@ -66,7 +66,7 @@ export default function CalculationExplanation() {
               </Typography>
               <Typography component="li">
                 <b>Calculating Tiles</b>: The resized image is divided into tiles
-                based on the model's tile size of {model.tileSizeLength}px &times;{" "}
+                based on the model&apos;s tile size of {model.tileSizeLength}px &times;{" "}
                 {model.tileSizeLength}px.
               </Typography>
               <Typography component="li">

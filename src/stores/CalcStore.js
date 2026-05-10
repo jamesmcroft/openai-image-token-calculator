@@ -187,3 +187,11 @@ function calculatePatchBased(model, images) {
     };
   });
 }
+
+export {
+  getResizedImageSize,
+  calculateTileBased,
+  getPatchCount,
+  resizeForPatchBudget,
+  calculatePatchBased,
+};
