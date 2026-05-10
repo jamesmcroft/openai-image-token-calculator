@@ -21,6 +21,8 @@ export default function CalculatorOutput() {
 
   if (totalTokens === null) return null;
 
+  const isPatch = model?.tokenizationType === "patch";
+
   const currency = new Intl.NumberFormat(undefined, {
     style: "currency",
     currency: "USD",
@@ -36,33 +38,31 @@ export default function CalculatorOutput() {
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
         <Typography variant="h6">Result</Typography>
         {model?.name && <Chip size="small" label={model.name} />}
+        {model?.retirementDate && (
+          <Chip
+            size="small"
+            label={`Retires ${model.retirementDate}`}
+            color="warning"
+            variant="outlined"
+          />
+        )}
       </Stack>
-      <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
-        <Table size="small" aria-label="summary table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Base tokens</TableCell>
-              <TableCell>Tile tokens</TableCell>
-              <TableCell>Total tokens</TableCell>
-              <TableCell>Total price</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>{model?.baseTokens}</TableCell>
-              <TableCell>
-                {model.tokensPerTile} ×{" "}
-                {images
-                  .map((image) => image.totalTiles ?? 0)
-                  .reduce((acc, val) => acc + val, 0)}{" "}
-                = {totalTokens - (model?.baseTokens || 0)}
-              </TableCell>
-              <TableCell>{totalTokens}</TableCell>
-              <TableCell>{currency}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+      {isPatch ? (
+        <PatchSummary
+          model={model}
+          images={images}
+          totalTokens={totalTokens}
+          currency={currency}
+        />
+      ) : (
+        <TileSummary
+          model={model}
+          images={images}
+          totalTokens={totalTokens}
+          currency={currency}
+        />
+      )}
 
       {images.map((img, i) =>
         img.resizedHeight ? (
@@ -75,19 +75,29 @@ export default function CalculatorOutput() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Resized Size</TableCell>
-                    <TableCell>Tiles (per image)</TableCell>
-                    <TableCell>Total tiles</TableCell>
+                    <TableCell>
+                      {isPatch ? "Patches (per image)" : "Tiles (per image)"}
+                    </TableCell>
+                    <TableCell>
+                      {isPatch ? "Total patches" : "Total tiles"}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
                     <TableCell>
-                      {img.resizedHeight} × {img.resizedWidth}
+                      {img.resizedHeight} &times; {img.resizedWidth}
                     </TableCell>
                     <TableCell>
-                      {img.tilesHigh} × {img.tilesWide}
+                      {isPatch
+                        ? `${img.tokenization?.patchesHigh ?? 0} \u00d7 ${img.tokenization?.patchesWide ?? 0}`
+                        : `${img.tokenization?.tilesHigh ?? 0} \u00d7 ${img.tokenization?.tilesWide ?? 0}`}
                     </TableCell>
-                    <TableCell>{img.totalTiles}</TableCell>
+                    <TableCell>
+                      {isPatch
+                        ? img.tokenization?.totalPatches ?? 0
+                        : img.tokenization?.totalTiles ?? 0}
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -96,5 +106,66 @@ export default function CalculatorOutput() {
         ) : null
       )}
     </Box>
+  );
+}
+
+function TileSummary({ model, images, totalTokens, currency }) {
+  const totalTileTokens = totalTokens - (model?.baseTokens || 0);
+  const totalTiles = images
+    .map((img) => img.tokenization?.totalTiles ?? 0)
+    .reduce((acc, val) => acc + val, 0);
+
+  return (
+    <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
+      <Table size="small" aria-label="summary table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Base tokens</TableCell>
+            <TableCell>Tile tokens</TableCell>
+            <TableCell>Total tokens</TableCell>
+            <TableCell>Total price</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell>{model?.baseTokens}</TableCell>
+            <TableCell>
+              {model?.tokensPerTile} &times; {totalTiles} = {totalTileTokens}
+            </TableCell>
+            <TableCell>{totalTokens}</TableCell>
+            <TableCell>{currency}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+function PatchSummary({ model, images, totalTokens, currency }) {
+  const totalPatches = images
+    .map((img) => img.tokenization?.totalPatches ?? 0)
+    .reduce((acc, val) => acc + val, 0);
+
+  return (
+    <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
+      <Table size="small" aria-label="summary table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Total patches</TableCell>
+            <TableCell>Token multiplier</TableCell>
+            <TableCell>Total tokens</TableCell>
+            <TableCell>Total price</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell>{totalPatches}</TableCell>
+            <TableCell>&times;{model?.tokenMultiplier}</TableCell>
+            <TableCell>{totalTokens}</TableCell>
+            <TableCell>{currency}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
