@@ -1,4 +1,10 @@
-import { Autocomplete, TextField, Stack, Chip } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useBoundStore } from "../../stores";
 
 export default function ModelSelector({ modelName, setModelName }) {
@@ -28,6 +34,27 @@ export default function ModelSelector({ modelName, setModelName }) {
         setModel(val.raw);
         runCalculation();
       }}
+      renderOption={(props, option) => (
+        <Box
+          component="li"
+          {...props}
+          key={option.label}
+          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        >
+          <Typography variant="body2" noWrap>
+            {option.label}
+          </Typography>
+          {option.raw.retirementDate && (
+            <Chip
+              label={`Retires ${option.raw.retirementDate}`}
+              size="small"
+              color="warning"
+              variant="outlined"
+              sx={{ ml: "auto", flexShrink: 0 }}
+            />
+          )}
+        </Box>
+      )}
       renderInput={(params) => (
         <TextField
           {...params}

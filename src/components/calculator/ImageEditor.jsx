@@ -85,7 +85,10 @@ export default function ImageEditor() {
   return (
     <Stack spacing={2}>
       {/* Top toolbar: Add Image (left) and utilities (right) */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center", justifyContent: "space-between" }}
+      >
         <Button
           size="small"
           startIcon={<Add />}
@@ -124,14 +127,12 @@ export default function ImageEditor() {
                 <Grid size={{ xs: 12 }}>
                   <Stack
                     direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
+                    sx={{ alignItems: "center", justifyContent: "space-between" }}
                   >
                     <Stack
                       direction="row"
-                      alignItems="center"
                       spacing={1}
-                      minWidth={0}
+                      sx={{ alignItems: "center", minWidth: 0 }}
                     >
                       <Typography variant="subtitle1" noWrap>
                         Image {idx + 1}
@@ -147,7 +148,7 @@ export default function ImageEditor() {
                         </Typography>
                       )}
                     </Stack>
-                    <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
                       <Tooltip title="Duplicate image">
                         <IconButton
                           color="primary"
