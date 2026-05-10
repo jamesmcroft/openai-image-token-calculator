@@ -5,6 +5,7 @@ import {
   getPatchCount,
   resizeForPatchBudget,
   calculatePatchBased,
+  calculateForModel,
 } from "../CalcStore";
 
 // ---------------------------------------------------------------------------
@@ -58,34 +59,34 @@ describe("calculateTileBased", () => {
 
   it("calculates tokens for a standard image", () => {
     const images = [{ height: 1024, width: 1024, multiplier: 1 }];
-    calculateTileBased(gpt5Model, images);
+    const results = calculateTileBased(gpt5Model, images);
 
-    expect(images[0].tokenization.type).toBe("tile");
-    expect(images[0].resizedHeight).toBe(768);
-    expect(images[0].resizedWidth).toBe(768);
-    expect(images[0].tokenization.tilesHigh).toBe(2);
-    expect(images[0].tokenization.tilesWide).toBe(2);
-    expect(images[0].tokenization.totalTiles).toBe(4);
+    expect(results[0].tokenization.type).toBe("tile");
+    expect(results[0].resizedHeight).toBe(768);
+    expect(results[0].resizedWidth).toBe(768);
+    expect(results[0].tokenization.tilesHigh).toBe(2);
+    expect(results[0].tokenization.tilesWide).toBe(2);
+    expect(results[0].tokenization.totalTiles).toBe(4);
     // 4 tiles * 140 + 70 base = 630
-    expect(images[0].tokenization.imageTokens).toBe(630);
+    expect(results[0].tokenization.imageTokens).toBe(630);
   });
 
   it("handles multiplier correctly", () => {
     const images = [{ height: 1024, width: 1024, multiplier: 3 }];
-    calculateTileBased(gpt5Model, images);
+    const results = calculateTileBased(gpt5Model, images);
 
-    expect(images[0].tokenization.totalTiles).toBe(12);
+    expect(results[0].tokenization.totalTiles).toBe(12);
     // 4 tiles * 140 * 3 + 70 = 1750
-    expect(images[0].tokenization.imageTokens).toBe(1750);
+    expect(results[0].tokenization.imageTokens).toBe(1750);
   });
 
   it("handles large image that needs max dimension scaling", () => {
     const images = [{ height: 4096, width: 3072, multiplier: 1 }];
-    calculateTileBased(gpt5Model, images);
+    const results = calculateTileBased(gpt5Model, images);
 
-    expect(images[0].resizedHeight).toBeLessThanOrEqual(2048);
-    expect(images[0].resizedWidth).toBeLessThanOrEqual(2048);
-    expect(images[0].tokenization.imageTokens).toBeGreaterThan(70);
+    expect(results[0].resizedHeight).toBeLessThanOrEqual(2048);
+    expect(results[0].resizedWidth).toBeLessThanOrEqual(2048);
+    expect(results[0].tokenization.imageTokens).toBeGreaterThan(70);
   });
 
   it("uses GPT-4o-mini token values correctly", () => {
@@ -98,10 +99,17 @@ describe("calculateTileBased", () => {
       costPerMillionTokens: 0.15,
     };
     const images = [{ height: 768, width: 768, multiplier: 1 }];
-    calculateTileBased(miniModel, images);
+    const results = calculateTileBased(miniModel, images);
 
     // 2x2 tiles * 5667 + 2833 = 25501
-    expect(images[0].tokenization.imageTokens).toBe(25501);
+    expect(results[0].tokenization.imageTokens).toBe(25501);
+  });
+
+  it("does not mutate input images", () => {
+    const images = [{ height: 1024, width: 1024, multiplier: 1 }];
+    const original = JSON.parse(JSON.stringify(images));
+    calculateTileBased(gpt5Model, images);
+    expect(images).toEqual(original);
   });
 });
 
@@ -206,70 +214,132 @@ describe("calculatePatchBased", () => {
 
   it("calculates tokens for a standard image within budget", () => {
     const images = [{ height: 1024, width: 1024, multiplier: 1 }];
-    calculatePatchBased(gpt54Model, images);
+    const results = calculatePatchBased(gpt54Model, images);
 
-    expect(images[0].tokenization.type).toBe("patch");
+    expect(results[0].tokenization.type).toBe("patch");
     // 1024 patches * 1.0 multiplier = 1024 tokens
-    expect(images[0].tokenization.imageTokens).toBe(1024);
-    expect(images[0].tokenization.totalPatches).toBe(1024);
+    expect(results[0].tokenization.imageTokens).toBe(1024);
+    expect(results[0].tokenization.totalPatches).toBe(1024);
   });
 
   it("applies token multiplier for mini models", () => {
     const images = [{ height: 1024, width: 1024, multiplier: 1 }];
-    calculatePatchBased(gpt54MiniModel, images);
+    const results = calculatePatchBased(gpt54MiniModel, images);
 
     // 1024 patches * 1.62 = 1658.88, ceil = 1659
-    expect(images[0].tokenization.imageTokens).toBe(1659);
+    expect(results[0].tokenization.imageTokens).toBe(1659);
   });
 
   it("handles multiplier (quantity) correctly", () => {
     const images = [{ height: 1024, width: 1024, multiplier: 3 }];
-    calculatePatchBased(gpt54MiniModel, images);
+    const results = calculatePatchBased(gpt54MiniModel, images);
 
-    expect(images[0].tokenization.totalPatches).toBe(1024 * 3);
+    expect(results[0].tokenization.totalPatches).toBe(1024 * 3);
     // ceil(1024 * 1.62) * 3 = 1659 * 3 = 4977
-    expect(images[0].tokenization.imageTokens).toBe(4977);
+    expect(results[0].tokenization.imageTokens).toBe(4977);
   });
 
   it("scales down oversized images to max dimension first", () => {
     const images = [{ height: 4096, width: 4096, multiplier: 1 }];
-    calculatePatchBased(gpt54Model, images);
+    const results = calculatePatchBased(gpt54Model, images);
 
-    expect(images[0].resizedHeight).toBeLessThanOrEqual(2048);
-    expect(images[0].resizedWidth).toBeLessThanOrEqual(2048);
+    expect(results[0].resizedHeight).toBeLessThanOrEqual(2048);
+    expect(results[0].resizedWidth).toBeLessThanOrEqual(2048);
   });
 
   it("returns zero tokens for 0x0 image", () => {
     const images = [{ height: 0, width: 0, multiplier: 1 }];
-    calculatePatchBased(gpt54Model, images);
+    const results = calculatePatchBased(gpt54Model, images);
 
-    expect(images[0].tokenization.imageTokens).toBe(0);
-    expect(images[0].tokenization.totalPatches).toBe(0);
+    expect(results[0].tokenization.imageTokens).toBe(0);
+    expect(results[0].tokenization.totalPatches).toBe(0);
   });
 
   it("handles very small image (1x1)", () => {
     const images = [{ height: 1, width: 1, multiplier: 1 }];
-    calculatePatchBased(gpt54Model, images);
+    const results = calculatePatchBased(gpt54Model, images);
 
     // 1 patch * 1.0 = 1 token
-    expect(images[0].tokenization.imageTokens).toBe(1);
-    expect(images[0].tokenization.patchesHigh).toBe(1);
-    expect(images[0].tokenization.patchesWide).toBe(1);
+    expect(results[0].tokenization.imageTokens).toBe(1);
+    expect(results[0].tokenization.patchesHigh).toBe(1);
+    expect(results[0].tokenization.patchesWide).toBe(1);
   });
 
   it("handles wide aspect ratio", () => {
     const images = [{ height: 100, width: 2000, multiplier: 1 }];
-    calculatePatchBased(gpt54Model, images);
+    const results = calculatePatchBased(gpt54Model, images);
 
-    expect(images[0].tokenization.imageTokens).toBeGreaterThan(0);
-    expect(images[0].resizedWidth).toBeLessThanOrEqual(2048);
+    expect(results[0].tokenization.imageTokens).toBeGreaterThan(0);
+    expect(results[0].resizedWidth).toBeLessThanOrEqual(2048);
   });
 
   it("handles tall aspect ratio", () => {
     const images = [{ height: 2000, width: 100, multiplier: 1 }];
-    calculatePatchBased(gpt54Model, images);
+    const results = calculatePatchBased(gpt54Model, images);
 
-    expect(images[0].tokenization.imageTokens).toBeGreaterThan(0);
-    expect(images[0].resizedHeight).toBeLessThanOrEqual(2048);
+    expect(results[0].tokenization.imageTokens).toBeGreaterThan(0);
+    expect(results[0].resizedHeight).toBeLessThanOrEqual(2048);
+  });
+
+  it("does not mutate input images", () => {
+    const images = [{ height: 1024, width: 1024, multiplier: 1 }];
+    const original = JSON.parse(JSON.stringify(images));
+    calculatePatchBased(gpt54Model, images);
+    expect(images).toEqual(original);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// calculateForModel
+// ---------------------------------------------------------------------------
+
+describe("calculateForModel", () => {
+  const tileModel = {
+    tokensPerTile: 140,
+    maxImageDimension: 2048,
+    imageMinSizeLength: 768,
+    tileSizeLength: 512,
+    baseTokens: 70,
+    costPerMillionTokens: 1.25,
+  };
+
+  const patchModel = {
+    tokenizationType: "patch",
+    patchSize: 32,
+    patchBudget: 2500,
+    tokenMultiplier: 1.0,
+    maxImageDimension: 2048,
+    costPerMillionTokens: 2.5,
+  };
+
+  it("returns totalTokens, totalCost, and imageResults for tile model", () => {
+    const images = [{ height: 1024, width: 1024, multiplier: 1 }];
+    const result = calculateForModel(tileModel, images);
+
+    expect(result).toHaveProperty("totalTokens");
+    expect(result).toHaveProperty("totalCost");
+    expect(result).toHaveProperty("imageResults");
+    expect(result.imageResults).toHaveLength(1);
+    expect(result.totalTokens).toBe(630);
+    expect(result.imageResults[0].tokenization.type).toBe("tile");
+  });
+
+  it("returns totalTokens, totalCost, and imageResults for patch model", () => {
+    const images = [{ height: 1024, width: 1024, multiplier: 1 }];
+    const result = calculateForModel(patchModel, images);
+
+    expect(result.imageResults).toHaveLength(1);
+    expect(result.totalTokens).toBe(1024);
+    expect(result.imageResults[0].tokenization.type).toBe("patch");
+  });
+
+  it("does not mutate input images", () => {
+    const images = [
+      { height: 1024, width: 1024, multiplier: 1 },
+      { height: 2000, width: 100, multiplier: 2 },
+    ];
+    const original = JSON.parse(JSON.stringify(images));
+    calculateForModel(tileModel, images);
+    expect(images).toEqual(original);
   });
 });

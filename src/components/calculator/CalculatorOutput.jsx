@@ -17,7 +17,7 @@ export default function CalculatorOutput() {
   const totalTokens = useBoundStore((s) => s.totalTokens);
   const totalCost = useBoundStore((s) => s.totalCost);
   const model = useBoundStore((s) => s.model);
-  const images = useBoundStore((s) => s.images);
+  const imageResults = useBoundStore((s) => s.imageResults);
 
   if (totalTokens === null) return null;
 
@@ -51,20 +51,20 @@ export default function CalculatorOutput() {
       {isPatch ? (
         <PatchSummary
           model={model}
-          images={images}
+          imageResults={imageResults}
           totalTokens={totalTokens}
           currency={currency}
         />
       ) : (
         <TileSummary
           model={model}
-          images={images}
+          imageResults={imageResults}
           totalTokens={totalTokens}
           currency={currency}
         />
       )}
 
-      {images.map((img, i) =>
+      {imageResults.map((img, i) =>
         img.resizedHeight ? (
           <Box key={i} sx={{ mb: 2 }}>
             <Typography variant="subtitle1" gutterBottom>
@@ -109,9 +109,9 @@ export default function CalculatorOutput() {
   );
 }
 
-function TileSummary({ model, images, totalTokens, currency }) {
+function TileSummary({ model, imageResults, totalTokens, currency }) {
   const totalTileTokens = totalTokens - (model?.baseTokens || 0);
-  const totalTiles = images
+  const totalTiles = imageResults
     .map((img) => img.tokenization?.totalTiles ?? 0)
     .reduce((acc, val) => acc + val, 0);
 
@@ -141,8 +141,8 @@ function TileSummary({ model, images, totalTokens, currency }) {
   );
 }
 
-function PatchSummary({ model, images, totalTokens, currency }) {
-  const totalPatches = images
+function PatchSummary({ model, imageResults, totalTokens, currency }) {
+  const totalPatches = imageResults
     .map((img) => img.tokenization?.totalPatches ?? 0)
     .reduce((acc, val) => acc + val, 0);
 

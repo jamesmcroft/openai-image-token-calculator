@@ -1,6 +1,7 @@
 export const calcStore = (set, get) => ({
   model: "",
   images: [],
+  imageResults: [],
   totalTokens: null,
   totalCost: null,
 
@@ -18,29 +19,12 @@ export const calcStore = (set, get) => ({
   },
 
   resetCalculation: () => {
-    set(() => ({ totalTokens: null, totalCost: null }));
+    set(() => ({ imageResults: [], totalTokens: null, totalCost: null }));
   },
   runCalculation: () => {
     const { model, images } = get();
-    const tokenizationType = model.tokenizationType ?? "tile";
-
-    if (tokenizationType === "patch") {
-      calculatePatchBased(model, images);
-    } else {
-      calculateTileBased(model, images);
-    }
-
-    set(() => ({ images: images }));
-
-    const totalTokens = images.reduce(
-      (acc, img) => acc + (img.tokenization?.imageTokens ?? 0),
-      0
-    );
-
-    set(() => ({ totalTokens }));
-
-    const totalCost = (totalTokens / 1000000) * model.costPerMillionTokens;
-    set(() => ({ totalCost: totalCost.toFixed(5) }));
+    const { totalTokens, totalCost, imageResults } = calculateForModel(model, images);
+    set(() => ({ imageResults, totalTokens, totalCost }));
   },
 });
 
@@ -74,7 +58,7 @@ function getResizedImageSize(maxDimension, minSide, height, width) {
 function calculateTileBased(model, images) {
   const { tokensPerTile, maxImageDimension, imageMinSizeLength, tileSizeLength, baseTokens } = model;
 
-  images.forEach((image) => {
+  return images.map((image) => {
     const imgSize = getResizedImageSize(
       maxImageDimension,
       imageMinSizeLength,
@@ -87,16 +71,18 @@ function calculateTileBased(model, images) {
     const totalTiles = tilesHigh * tilesWide * image.multiplier;
     const imageTokens = tilesHigh * tilesWide * tokensPerTile * image.multiplier + baseTokens;
 
-    image.resizedHeight = imgSize.height;
-    image.resizedWidth = imgSize.width;
-    image.tokenization = {
-      type: "tile",
-      tilesHigh,
-      tilesWide,
-      totalTiles,
-      tokensPerTile,
-      baseTokens,
-      imageTokens,
+    return {
+      resizedHeight: imgSize.height,
+      resizedWidth: imgSize.width,
+      tokenization: {
+        type: "tile",
+        tilesHigh,
+        tilesWide,
+        totalTiles,
+        tokensPerTile,
+        baseTokens,
+        imageTokens,
+      },
     };
   });
 }
@@ -141,22 +127,23 @@ function resizeForPatchBudget(patchSize, patchBudget, height, width) {
 function calculatePatchBased(model, images) {
   const { patchSize, patchBudget, tokenMultiplier, maxImageDimension } = model;
 
-  images.forEach((image) => {
+  return images.map((image) => {
     let w = image.width;
     let h = image.height;
 
     if (w <= 0 || h <= 0) {
-      image.resizedHeight = h;
-      image.resizedWidth = w;
-      image.tokenization = {
-        type: "patch",
-        patchesWide: 0,
-        patchesHigh: 0,
-        totalPatches: 0,
-        tokenMultiplier,
-        imageTokens: 0,
+      return {
+        resizedHeight: h,
+        resizedWidth: w,
+        tokenization: {
+          type: "patch",
+          patchesWide: 0,
+          patchesHigh: 0,
+          totalPatches: 0,
+          tokenMultiplier,
+          imageTokens: 0,
+        },
       };
-      return;
     }
 
     // Step 1: Scale to fit within maxImageDimension
@@ -175,17 +162,37 @@ function calculatePatchBased(model, images) {
     const imageTokens =
       Math.ceil(result.patches * tokenMultiplier) * image.multiplier;
 
-    image.resizedHeight = result.height;
-    image.resizedWidth = result.width;
-    image.tokenization = {
-      type: "patch",
-      patchesWide,
-      patchesHigh,
-      totalPatches,
-      tokenMultiplier,
-      imageTokens,
+    return {
+      resizedHeight: result.height,
+      resizedWidth: result.width,
+      tokenization: {
+        type: "patch",
+        patchesWide,
+        patchesHigh,
+        totalPatches,
+        tokenMultiplier,
+        imageTokens,
+      },
     };
   });
+}
+
+function calculateForModel(model, images) {
+  const tokenizationType = model.tokenizationType ?? "tile";
+
+  const imageResults =
+    tokenizationType === "patch"
+      ? calculatePatchBased(model, images)
+      : calculateTileBased(model, images);
+
+  const totalTokens = imageResults.reduce(
+    (acc, r) => acc + (r.tokenization?.imageTokens ?? 0),
+    0
+  );
+
+  const totalCost = ((totalTokens / 1000000) * model.costPerMillionTokens).toFixed(5);
+
+  return { totalTokens, totalCost, imageResults };
 }
 
 export {
@@ -194,4 +201,5 @@ export {
   getPatchCount,
   resizeForPatchBudget,
   calculatePatchBased,
+  calculateForModel,
 };
