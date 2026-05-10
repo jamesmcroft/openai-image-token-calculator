@@ -7,6 +7,8 @@
     "dev": "vite -m dev --host 0.0.0.0 --port 5173 --strictPort",
     "build": "vite build -m prod",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -23,10 +25,12 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.5",
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",
-    "vite": "^8.0.11"
+    "vite": "^8.0.11",
+    "vitest": "^4.1.5"
   }
 }

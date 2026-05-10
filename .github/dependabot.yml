@@ -26,6 +26,10 @@ updates:
       patterns:
       - "vite"
       - "@vitejs/*"
+    testing:
+      patterns:
+      - "vitest"
+      - "@vitest/*"
 
 - package-ecosystem: github-actions
   directory: "/"

@@ -1,7 +1,6 @@
 # Azure OpenAI Image Token Calculator
 
-[![Build status](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/pr-validation.yml/badge.svg?branch=main)](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/pr-validation.yml)
-[![GitHub Pages](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/github-pages.yml/badge.svg)](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/github-pages.yml)
+[![CI](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jamesmcroft/openai-image-token-calculator/actions/workflows/ci.yml)
 
 The Azure OpenAI Image Token Calculator is a simple application designed to estimate the number of tokens and the cost associated with processing images using Azure OpenAI's multimodal models, such as GPT-5, GPT-4.1, o-series, GPT-4o, and Computer Use. This tool helps users understand the how the tokens and cost is calculated based on the selected model's specifications and the number of images to be processed.
 
