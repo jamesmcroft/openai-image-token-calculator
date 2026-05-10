@@ -9,6 +9,8 @@ import { useBoundStore } from "../../stores";
 
 export default function CalculationExplanation() {
   const model = useBoundStore((s) => s.model);
+  const comparisonMode = useBoundStore((s) => s.comparisonMode);
+  const comparisonResults = useBoundStore((s) => s.comparisonResults);
   const isPatch = model?.tokenizationType === "patch";
 
   return (
@@ -24,7 +26,35 @@ export default function CalculationExplanation() {
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
-        {model ? (
+        {comparisonMode ? (
+          comparisonResults.length > 0 ? (
+            <Stack spacing={1.25}>
+              <Typography>
+                Each selected model calculates tokens independently against the
+                same set of images. Results are sorted by estimated cost
+                (cheapest first).
+              </Typography>
+              <Typography>
+                <b>Tile-based models</b> (GPT-4o, GPT-5, o1/o3): Images are
+                resized and divided into fixed-size tiles. Tokens = (tiles x
+                tokens per tile) + base tokens.
+              </Typography>
+              <Typography>
+                <b>Patch-based models</b> (GPT-5.2+, GPT-5.4, o4-mini): Images
+                are covered with patches and constrained by a patch budget.
+                Tokens = patches x token multiplier.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Click a row in the comparison table to see the per-image
+                breakdown for that model.
+              </Typography>
+            </Stack>
+          ) : (
+            <Typography>
+              Select models and add images to see comparison results.
+            </Typography>
+          )
+        ) : model ? (
           isPatch ? (
             <Stack spacing={1.25} component="ol" sx={{ pl: 2 }}>
               <Typography component="li">
