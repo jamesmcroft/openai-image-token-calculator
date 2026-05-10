@@ -106,8 +106,9 @@ function ImageBreakdownList({ imageResults, isPatch }) {
   );
 
   // Reconcile when the set of valid images changes
-  const validIndices = validResults.map(({ idx }) => idx);
+  const validIndicesKey = validResults.map(({ idx }) => idx).join(",");
   useEffect(() => {
+    const validIndices = validIndicesKey.split(",").filter(Boolean).map(Number);
     setCollapsedSet((prev) => {
       const validSet = new Set(validIndices);
       // Remove indices that no longer exist
@@ -116,14 +117,13 @@ function ImageBreakdownList({ imageResults, isPatch }) {
       if (validIndices.length >= 3) {
         for (const idx of validIndices) {
           if (!pruned.has(idx) && !prev.has(idx)) {
-            // Truly new index (was not in prev at all, not just pruned)
             pruned.add(idx);
           }
         }
       }
       return pruned;
     });
-  }, [validIndices.join(",")]);
+  }, [validIndicesKey]);
 
   const toggle = (i) =>
     setCollapsedSet((prev) => {
