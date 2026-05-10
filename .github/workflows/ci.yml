@@ -4,23 +4,23 @@ on:
   push:
     branches: ["main"]
     paths:
-    - src/**
-    - public/**
-    - index.html
-    - package.json
-    - package-lock.json
-    - vite.config.js
-    - .github/workflows/ci.yml
+      - src/**
+      - public/**
+      - index.html
+      - package.json
+      - package-lock.json
+      - vite.config.js
+      - .github/workflows/ci.yml
   pull_request:
     branches: ["main"]
     paths:
-    - src/**
-    - public/**
-    - index.html
-    - package.json
-    - package-lock.json
-    - vite.config.js
-    - .github/workflows/ci.yml
+      - src/**
+      - public/**
+      - index.html
+      - package.json
+      - package-lock.json
+      - vite.config.js
+      - .github/workflows/ci.yml
   workflow_dispatch:
 
 permissions:
@@ -59,7 +59,7 @@ jobs:
       - name: Publish coverage to workflow summary
         run: cat coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: Post coverage to PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         run: gh pr comment $PR_NUMBER --edit-last --create-if-none --body-file coverage-report/SummaryGithub.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

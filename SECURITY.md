@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability in this project, please report it responsibly. Do not open a public issue.
 
-Instead, please contact us through our [online contact form](http://jamescroft.co.uk/contact/) with details of the vulnerability.
+Instead, please contact us through our [online contact form](https://jamescroft.co.uk/contact/) with details of the vulnerability.
 
 We will acknowledge receipt of your report within 48 hours and aim to provide a fix or mitigation plan as soon as possible.
 

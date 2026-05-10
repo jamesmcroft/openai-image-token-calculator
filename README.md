@@ -69,7 +69,7 @@ As many developers know, projects like this are built and maintained in maintain
 👤 **James Croft**
 
 * Website: <https://www.jamescroft.co.uk>
-* Github: [@jamesmcroft](https://github.com/jamesmcroft)
+* GitHub: [@jamesmcroft](https://github.com/jamesmcroft)
 * LinkedIn: [@jmcroft](https://linkedin.com/in/jmcroft)
 
 ## License

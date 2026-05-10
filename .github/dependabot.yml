@@ -12,24 +12,24 @@ updates:
   groups:
     mui:
       patterns:
-      - "@mui/*"
-      - "@emotion/*"
+        - "@mui/*"
+        - "@emotion/*"
     react:
       patterns:
-      - "react"
-      - "react-dom"
-      - "@types/react*"
+        - "react"
+        - "react-dom"
+        - "@types/react*"
     eslint:
       patterns:
-      - "eslint*"
+        - "eslint*"
     vite:
       patterns:
-      - "vite"
-      - "@vitejs/*"
+        - "vite"
+        - "@vitejs/*"
     testing:
       patterns:
-      - "vitest"
-      - "@vitest/*"
+        - "vitest"
+        - "@vitest/*"
 
 - package-ecosystem: github-actions
   directory: "/"
