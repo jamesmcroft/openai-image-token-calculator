@@ -319,6 +319,79 @@ describe("formatResultsAsText", () => {
     expect(text).toContain("Image 1:");
     expect(text).toContain("?x?, Qty 1");
   });
+
+  it("includes cost projection when requestsPerDay is set", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [{ width: 1024, height: 768, multiplier: 1 }],
+      imageResults: [
+        {
+          resizedWidth: 1024,
+          resizedHeight: 768,
+          tokenization: { type: "patch", totalPatches: 768, imageTokens: 768 },
+        },
+      ],
+      totalTokens: 768,
+      totalCost: "0.00192",
+      requestsPerDay: 1000,
+    });
+
+    expect(text).toContain("Cost Projection");
+    expect(text).toContain("Requests per day: 1,000");
+    expect(text).toContain("Daily:");
+    expect(text).toContain("Monthly (30 days):");
+  });
+
+  it("excludes cost projection when requestsPerDay is 0", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [{ width: 1024, height: 768, multiplier: 1 }],
+      imageResults: [
+        {
+          resizedWidth: 1024,
+          resizedHeight: 768,
+          tokenization: { type: "patch", totalPatches: 768, imageTokens: 768 },
+        },
+      ],
+      totalTokens: 768,
+      totalCost: "0.00192",
+      requestsPerDay: 0,
+    });
+
+    expect(text).not.toContain("Cost Projection");
+  });
+
+  it("excludes cost projection when totalCost is 0", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [{ width: 100, height: 100, multiplier: 1 }],
+      imageResults: [
+        {
+          resizedWidth: 100,
+          resizedHeight: 100,
+          tokenization: { type: "patch", totalPatches: 16, imageTokens: 0 },
+        },
+      ],
+      totalTokens: 0,
+      totalCost: "0",
+      requestsPerDay: 1000,
+    });
+
+    expect(text).not.toContain("Cost Projection");
+  });
+
+  it("excludes cost projection when totalCost is null", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [],
+      imageResults: [],
+      totalTokens: 0,
+      totalCost: null,
+      requestsPerDay: 500,
+    });
+
+    expect(text).not.toContain("Cost Projection");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -415,6 +488,27 @@ describe("formatResultsAsTsv", () => {
     const dataLines = tsv.split("\n").filter((l) => l.startsWith("1") || l.startsWith("2"));
     expect(dataLines).toHaveLength(1);
   });
+
+  it("includes projection rows when requestsPerDay is set", () => {
+    const tsv = formatResultsAsTsv({
+      model: patchModel,
+      images: [{ width: 1024, height: 768, multiplier: 1 }],
+      imageResults: [
+        {
+          resizedWidth: 1024,
+          resizedHeight: 768,
+          tokenization: { type: "patch", totalPatches: 768, imageTokens: 768 },
+        },
+      ],
+      totalTokens: 768,
+      totalCost: "0.00192",
+      requestsPerDay: 500,
+    });
+
+    expect(tsv).toContain("Requests/Day\t500");
+    expect(tsv).toContain("Daily Cost");
+    expect(tsv).toContain("Monthly Cost (30d)");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -478,6 +572,42 @@ describe("formatComparisonAsText", () => {
 
     expect(text).toContain("No comparison results.");
   });
+
+  it("includes cost projection when requestsPerDay is set", () => {
+    const text = formatComparisonAsText({
+      images: [{ width: 1024, height: 768, multiplier: 1 }],
+      comparisonResults: [
+        {
+          model: patchModel,
+          totalTokens: 768,
+          totalCost: "0.00192",
+          imageResults: [],
+        },
+      ],
+      requestsPerDay: 1000,
+    });
+
+    expect(text).toContain("Cost Projection (1,000 requests/day)");
+    expect(text).toContain("GPT-5.4 (Global): Daily");
+    expect(text).toContain("Monthly");
+  });
+
+  it("excludes cost projection when requestsPerDay is 0", () => {
+    const text = formatComparisonAsText({
+      images: [],
+      comparisonResults: [
+        {
+          model: patchModel,
+          totalTokens: 768,
+          totalCost: "0.00192",
+          imageResults: [],
+        },
+      ],
+      requestsPerDay: 0,
+    });
+
+    expect(text).not.toContain("Cost Projection");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -517,5 +647,42 @@ describe("formatComparisonAsTsv", () => {
     const tsv = formatComparisonAsTsv({ comparisonResults: [] });
     const lines = tsv.split("\n");
     expect(lines).toHaveLength(1); // header only
+  });
+
+  it("adds daily and monthly columns when requestsPerDay is set", () => {
+    const tsv = formatComparisonAsTsv({
+      comparisonResults: [
+        {
+          model: patchModel,
+          totalTokens: 768,
+          totalCost: "0.00192",
+          imageResults: [],
+        },
+      ],
+      requestsPerDay: 500,
+    });
+
+    const lines = tsv.split("\n");
+    expect(lines[0]).toContain("Daily Cost");
+    expect(lines[0]).toContain("Monthly Cost (30d)");
+    expect(lines[1].split("\t").length).toBe(8);
+  });
+
+  it("omits projection columns when requestsPerDay is 0", () => {
+    const tsv = formatComparisonAsTsv({
+      comparisonResults: [
+        {
+          model: patchModel,
+          totalTokens: 768,
+          totalCost: "0.00192",
+          imageResults: [],
+        },
+      ],
+      requestsPerDay: 0,
+    });
+
+    const lines = tsv.split("\n");
+    expect(lines[0]).not.toContain("Daily Cost");
+    expect(lines[1].split("\t").length).toBe(6);
   });
 });
