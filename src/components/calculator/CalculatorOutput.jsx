@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -13,18 +13,16 @@ import {
   Chip,
   Collapse,
   IconButton,
-  Button,
 } from "@mui/material";
 import {
   BarChartOutlined,
   ExpandMore,
   ExpandLess,
-  ContentCopy,
-  Check,
 } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
 import ModelComment from "./comparison/ModelComment";
-import { formatResultsAsText } from "../../utils/formatResults";
+import CopyResultsButton from "./CopyResultsButton";
+import { formatResultsAsText, formatResultsAsTsv } from "../../utils/formatResults";
 
 export default function CalculatorOutput() {
   const totalTokens = useBoundStore((s) => s.totalTokens);
@@ -33,30 +31,12 @@ export default function CalculatorOutput() {
   const images = useBoundStore((s) => s.images);
   const imageResults = useBoundStore((s) => s.imageResults);
 
-  const [copyState, setCopyState] = useState("idle"); // "idle" | "copied" | "failed"
-
-  const handleCopy = useCallback(async () => {
-    const text = formatResultsAsText({
-      model,
-      images,
-      imageResults,
-      totalTokens,
-      totalCost,
-    });
-
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopyState("copied");
-    } catch {
-      setCopyState("failed");
-    }
-  }, [model, images, imageResults, totalTokens, totalCost]);
-
-  useEffect(() => {
-    if (copyState === "idle") return;
-    const timer = setTimeout(() => setCopyState("idle"), 2000);
-    return () => clearTimeout(timer);
-  }, [copyState]);
+  const copyFormats = {
+    text: () =>
+      formatResultsAsText({ model, images, imageResults, totalTokens, totalCost }),
+    table: () =>
+      formatResultsAsTsv({ model, images, imageResults, totalTokens, totalCost }),
+  };
 
   if (totalTokens === null) {
     return (
@@ -84,31 +64,20 @@ export default function CalculatorOutput() {
       sx={(theme) => ({ mt: 4, scrollMarginTop: `calc(${theme.spacing(10)})` })}
     >
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-        <Typography variant="h6">Result</Typography>
-        {model?.name && <Chip size="small" label={model.name} />}
-        {model?.retirementDate && (
-          <Chip
-            size="small"
-            label={`Retires ${model.retirementDate}`}
-            color="warning"
-            variant="outlined"
-          />
-        )}
-        <ModelComment comment={model?.comment} />
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={copyState === "copied" ? <Check /> : <ContentCopy />}
-          color={copyState === "failed" ? "error" : copyState === "copied" ? "success" : "primary"}
-          onClick={handleCopy}
-          sx={{ ml: "auto" }}
-        >
-          {copyState === "copied"
-            ? "Copied!"
-            : copyState === "failed"
-              ? "Copy failed"
-              : "Copy results"}
-        </Button>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ flex: 1, flexWrap: "wrap" }}>
+          <Typography variant="h6">Result</Typography>
+          {model?.name && <Chip size="small" label={model.name} />}
+          {model?.retirementDate && (
+            <Chip
+              size="small"
+              label={`Retires ${model.retirementDate}`}
+              color="warning"
+              variant="outlined"
+            />
+          )}
+          <ModelComment comment={model?.comment} />
+        </Stack>
+        <CopyResultsButton formats={copyFormats} />
       </Stack>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
         Results update as you change inputs

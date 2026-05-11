@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { formatResultsAsText } from "../formatResults";
+import {
+  formatResultsAsText,
+  formatResultsAsTsv,
+  formatComparisonAsText,
+  formatComparisonAsTsv,
+} from "../formatResults";
 
 const patchModel = {
   name: "GPT-5.4 (Global)",
@@ -264,5 +269,204 @@ describe("formatResultsAsText", () => {
 
     expect(text).toContain("Total tokens: 0");
     expect(text).toContain("Azure OpenAI Image Token Calculator");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatResultsAsTsv
+// ---------------------------------------------------------------------------
+
+describe("formatResultsAsTsv", () => {
+  it("produces tab-separated output for patch-based models", () => {
+    const tsv = formatResultsAsTsv({
+      model: patchModel,
+      images: [
+        { width: 1024, height: 768, multiplier: 2 },
+        { width: 1920, height: 1080, multiplier: 1 },
+      ],
+      imageResults: [
+        {
+          resizedWidth: 1024,
+          resizedHeight: 768,
+          tokenization: {
+            type: "patch",
+            totalPatches: 1536,
+            imageTokens: 1536,
+          },
+        },
+        {
+          resizedWidth: 1920,
+          resizedHeight: 1080,
+          tokenization: {
+            type: "patch",
+            totalPatches: 2040,
+            imageTokens: 2040,
+          },
+        },
+      ],
+      totalTokens: 3576,
+      totalCost: "0.00894",
+    });
+
+    const lines = tsv.split("\n");
+    // Header row uses tabs
+    expect(lines[0]).toBe("Image\tOriginal Size\tQty\tResized Size\tPatches\tTokens");
+    // Data rows are tab-separated
+    expect(lines[1]).toContain("1024x768");
+    expect(lines[1]).toContain("2");
+    expect(lines[1].split("\t").length).toBe(6);
+    // Totals
+    expect(tsv).toContain("Total Tokens\t3576");
+    expect(tsv).toContain("Model\tGPT-5.4 (Global)");
+  });
+
+  it("produces tab-separated output for tile-based models", () => {
+    const tsv = formatResultsAsTsv({
+      model: tileModel,
+      images: [{ width: 1024, height: 768, multiplier: 1 }],
+      imageResults: [
+        {
+          resizedWidth: 1024,
+          resizedHeight: 768,
+          tokenization: {
+            type: "tile",
+            totalTiles: 4,
+            imageTokens: 765,
+          },
+        },
+      ],
+      totalTokens: 765,
+      totalCost: "0.00191",
+    });
+
+    expect(tsv).toContain("Tiles");
+    expect(tsv).not.toContain("Patches");
+    expect(tsv).toContain("Total Tokens\t765");
+  });
+
+  it("skips entries with missing tokenization", () => {
+    const tsv = formatResultsAsTsv({
+      model: patchModel,
+      images: [
+        { width: 512, height: 512, multiplier: 1 },
+        { width: 0, height: 0, multiplier: 1 },
+      ],
+      imageResults: [
+        {
+          resizedWidth: 512,
+          resizedHeight: 512,
+          tokenization: { type: "patch", totalPatches: 256, imageTokens: 256 },
+        },
+        { resizedWidth: 0, resizedHeight: 0, tokenization: null },
+      ],
+      totalTokens: 256,
+      totalCost: "0.00064",
+    });
+
+    const dataLines = tsv.split("\n").filter((l) => l.startsWith("1") || l.startsWith("2"));
+    expect(dataLines).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatComparisonAsText
+// ---------------------------------------------------------------------------
+
+describe("formatComparisonAsText", () => {
+  it("formats a multi-model comparison", () => {
+    const text = formatComparisonAsText({
+      images: [{ width: 1024, height: 768, multiplier: 1 }],
+      comparisonResults: [
+        {
+          model: patchModel,
+          totalTokens: 768,
+          totalCost: "0.00192",
+          imageResults: [],
+        },
+        {
+          model: tileModel,
+          totalTokens: 765,
+          totalCost: "0.00191",
+          imageResults: [],
+        },
+      ],
+    });
+
+    expect(text).toContain("Model Comparison");
+    expect(text).toContain("GPT-5.4 (Global)");
+    expect(text).toContain("GPT-4o (2024-11-20 - Global)");
+    expect(text).toContain("Images: 1024x768");
+  });
+
+  it("includes retirement and comment notes", () => {
+    const retiringModel = {
+      ...tileModel,
+      retirementDate: "Oct 2026",
+      comment: "Input tokens only.",
+    };
+
+    const text = formatComparisonAsText({
+      images: [{ width: 100, height: 100, multiplier: 1 }],
+      comparisonResults: [
+        {
+          model: retiringModel,
+          totalTokens: 255,
+          totalCost: "0.00064",
+          imageResults: [],
+        },
+      ],
+    });
+
+    expect(text).toContain("Retires Oct 2026");
+    expect(text).toContain("Note [GPT-4o (2024-11-20 - Global)]: Input tokens only.");
+  });
+
+  it("handles empty comparison results", () => {
+    const text = formatComparisonAsText({
+      images: [],
+      comparisonResults: [],
+    });
+
+    expect(text).toContain("No comparison results.");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatComparisonAsTsv
+// ---------------------------------------------------------------------------
+
+describe("formatComparisonAsTsv", () => {
+  it("produces tab-separated comparison output", () => {
+    const tsv = formatComparisonAsTsv({
+      comparisonResults: [
+        {
+          model: patchModel,
+          totalTokens: 768,
+          totalCost: "0.00192",
+          imageResults: [],
+        },
+        {
+          model: { ...tileModel, retirementDate: "Oct 2026" },
+          totalTokens: 765,
+          totalCost: "0.00191",
+          imageResults: [],
+        },
+      ],
+    });
+
+    const lines = tsv.split("\n");
+    expect(lines[0]).toBe(
+      "Model\tType\tTotal Tokens\tEstimated Cost\tRate\tRetirement",
+    );
+    expect(lines[1]).toContain("GPT-5.4 (Global)");
+    expect(lines[1]).toContain("Patch");
+    expect(lines[1].split("\t").length).toBe(6);
+    expect(lines[2]).toContain("Oct 2026");
+  });
+
+  it("handles empty comparison results", () => {
+    const tsv = formatComparisonAsTsv({ comparisonResults: [] });
+    const lines = tsv.split("\n");
+    expect(lines).toHaveLength(1); // header only
   });
 });

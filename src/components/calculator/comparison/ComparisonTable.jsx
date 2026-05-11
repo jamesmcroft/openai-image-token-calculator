@@ -14,13 +14,21 @@ import {
 import { CompareArrowsOutlined } from "@mui/icons-material";
 import { useBoundStore } from "../../../stores";
 import ComparisonRow from "./ComparisonRow";
+import CopyResultsButton from "../CopyResultsButton";
+import { formatComparisonAsText, formatComparisonAsTsv } from "../../../utils/formatResults";
 
 export default function ComparisonTable() {
   const comparisonResults = useBoundStore((s) => s.comparisonResults);
+  const images = useBoundStore((s) => s.images);
   const expandedModelName = useBoundStore((s) => s.expandedModelName);
   const setExpandedModel = useBoundStore((s) => s.setExpandedModel);
   const sortOrder = useBoundStore((s) => s.comparisonSortOrder);
   const toggleSort = useBoundStore((s) => s.toggleComparisonSortOrder);
+
+  const copyFormats = {
+    text: () => formatComparisonAsText({ images, comparisonResults }),
+    table: () => formatComparisonAsTsv({ comparisonResults }),
+  };
 
   if (comparisonResults.length === 0) {
     return (
@@ -35,13 +43,14 @@ export default function ComparisonTable() {
 
   return (
     <Box id="results" sx={(theme) => ({ mt: 4, scrollMarginTop: `calc(${theme.spacing(10)})` })}>
-      <Stack spacing={1} sx={{ mb: 2 }}>
-        <Typography variant="h6">Comparison Results</Typography>
-        <Typography variant="body2" color="text.secondary">
-          Click the Estimated Cost header to toggle sort order. Click a row to
-          see per-image details.
-        </Typography>
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+        <Typography variant="h6" sx={{ flex: 1 }}>Comparison Results</Typography>
+        <CopyResultsButton formats={copyFormats} />
       </Stack>
+      <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: "block" }}>
+        Click the Estimated Cost header to toggle sort order. Click a row to
+        see per-image details.
+      </Typography>
       <TableContainer component={Paper} variant="outlined">
         <Table size="small" aria-label="model comparison results">
           <TableHead>
