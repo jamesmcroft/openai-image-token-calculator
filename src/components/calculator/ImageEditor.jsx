@@ -79,7 +79,16 @@ export default function ImageEditor() {
     collapseAll();
   };
 
-  const syncCalculation = () => runCalculation();
+  const comparisonMode = useBoundStore((s) => s.comparisonMode);
+  const runComparison = useBoundStore((s) => s.runComparison);
+
+  const syncCalculation = () => {
+    if (comparisonMode) {
+      runComparison();
+    } else {
+      runCalculation();
+    }
+  };
 
   return (
     <Stack spacing={2}>
