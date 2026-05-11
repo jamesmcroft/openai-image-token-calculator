@@ -8,6 +8,7 @@ import {
   InputAdornment,
   Collapse,
   IconButton,
+  Link,
 } from "@mui/material";
 import { Search, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
@@ -137,15 +138,15 @@ export default function ModelPicker({ modelName, setModelName }) {
               </Grid>
             ))}
           </Grid>
-          <Typography
+          <Link
+            component="button"
             variant="caption"
-            color="primary"
             fontWeight={600}
             onClick={() => setCollapsed(false)}
-            sx={{ cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+            underline="hover"
           >
             Change model{comparisonMode ? "s" : ""}
-          </Typography>
+          </Link>
         </Box>
       )}
 

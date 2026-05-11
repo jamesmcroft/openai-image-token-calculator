@@ -8,10 +8,11 @@ The Azure OpenAI Image Token Calculator is a simple application designed to esti
 
 ## Usage
 
-1. **Select a Model**: Choose a model from the dropdown menu.
-1. **Add Images**: Input the height and width of the images you will process in a single request. A multiplier can be applied also if you are processing many images of the same size.
-1. **Calculate**: Click the "Calculate" button to get the token and cost estimates.
-1. **View Results**: The results will display the token estimate and cost estimate based on the selected model.
+1. **Select a Model**: Browse the model cards using search and filter chips (Latest, Budget, Premium, Image Gen, Retiring) and tap a card to select it. In compare mode, select multiple models to see costs side by side.
+2. **Add Images**: Click "Add Image" and configure the height, width, and quantity for each image in your request. Use presets for common sizes or enter custom dimensions.
+3. **View Results**: Results update live as you change inputs. On desktop, the results panel is always visible on the right. On mobile and tablet, tap the bottom bar to view full results.
+4. **Cost Projection**: Enter a "Requests per day" value in the results panel to see estimated daily and monthly costs.
+5. **Share**: Copy results as text or a spreadsheet-friendly table, or copy a shareable link that encodes your full configuration.
 
 ## Running Locally
 

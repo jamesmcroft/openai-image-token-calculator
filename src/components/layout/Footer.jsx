@@ -22,6 +22,7 @@ export default function Footer() {
           variant="outlined"
           href="https://www.jamescroft.co.uk"
           target="_blank"
+          rel="noopener noreferrer"
           aria-label="Visit jamescroft.co.uk"
           size="small"
         >
@@ -32,6 +33,7 @@ export default function Footer() {
           variant="outlined"
           href="https://github.com/jamesmcroft/openai-image-token-calculator"
           target="_blank"
+          rel="noopener noreferrer"
           aria-label="View source on GitHub"
           size="small"
         >
@@ -42,6 +44,7 @@ export default function Footer() {
           variant="outlined"
           href="https://www.linkedin.com/in/jmcroft"
           target="_blank"
+          rel="noopener noreferrer"
           aria-label="Visit LinkedIn profile"
           size="small"
         >

@@ -1,11 +1,9 @@
-// Minimal service worker for PWA installability.
-// Caches the app shell on install for offline support.
+// Service worker for PWA installability and offline support.
 const CACHE_NAME = "aoai-calc-v1";
-const SHELL_URLS = ["/openai-image-token-calculator/"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_URLS)),
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(["./"]))
   );
   self.skipWaiting();
 });
@@ -20,6 +18,17 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  // For navigation requests (HTML pages), serve the cached shell
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        caches.match("./", { ignoreSearch: true }),
+      ),
+    );
+    return;
+  }
+
+  // For other requests, try network first then cache
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request)),
   );

@@ -49,6 +49,13 @@ export default function App() {
   const setComparisonMode = useBoundStore((s) => s.setComparisonMode);
   const runCalculation = useBoundStore((s) => s.runCalculation);
 
+  // Handle ?mode= query param from PWA shortcuts
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const modeParam = params.get("mode");
+    if (modeParam === "compare") setComparisonMode(true);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { warning, oversized } = useUrlState({ setModelName });
 
   const handleSubmit = (e) => {

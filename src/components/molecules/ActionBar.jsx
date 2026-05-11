@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import CopyButton from "../atoms/CopyButton";
 
-export default function ActionBar({ copyFormats, linkUrl, sx }) {
+export default function ActionBar({ copyFormats, showLink = true, sx }) {
   return (
     <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", ...sx }}>
       {copyFormats?.text && (
@@ -18,9 +18,9 @@ export default function ActionBar({ copyFormats, linkUrl, sx }) {
           tooltip="Copy as table (for spreadsheets)"
         />
       )}
-      {linkUrl !== undefined && (
+      {showLink && (
         <CopyButton
-          getText={() => linkUrl ?? window.location.href}
+          getText={() => window.location.href}
           label="Link"
           tooltip="Copy shareable link"
         />

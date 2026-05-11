@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   Box,
   Drawer,
@@ -32,7 +32,22 @@ export default function CalculatorLayout({ configPanel, resultsPanel }) {
 
   const toggleMobile = useCallback(() => setMobileOpen((o) => !o), []);
 
-  // Drag-to-resize handler
+  // Drag-to-resize handler with cleanup on unmount
+  const listenersRef = useRef(null);
+
+  const cleanupDrag = useCallback(() => {
+    if (listenersRef.current) {
+      document.removeEventListener("mousemove", listenersRef.current.move);
+      document.removeEventListener("mouseup", listenersRef.current.up);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      listenersRef.current = null;
+    }
+    dragging.current = false;
+  }, []);
+
+  useEffect(() => cleanupDrag, [cleanupDrag]);
+
   const handleMouseDown = useCallback((e) => {
     e.preventDefault();
     dragging.current = true;
@@ -46,19 +61,25 @@ export default function CalculatorLayout({ configPanel, resultsPanel }) {
       setResultsWidth(newWidth);
     };
 
-    const handleMouseUp = () => {
-      dragging.current = false;
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
+    const handleMouseUp = () => cleanupDrag();
 
+    listenersRef.current = { move: handleMouseMove, up: handleMouseUp };
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
-  }, [resultsWidth]);
+  }, [resultsWidth, cleanupDrag]);
+
+  const handleKeyDown = useCallback((e) => {
+    const step = e.shiftKey ? 50 : 10;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setResultsWidth((w) => Math.min(MAX_RESULTS_WIDTH, w + step));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setResultsWidth((w) => Math.max(MIN_RESULTS_WIDTH, w - step));
+    }
+  }, []);
 
   if (isDesktop) {
     return (
@@ -77,7 +98,15 @@ export default function CalculatorLayout({ configPanel, resultsPanel }) {
 
         {/* Resize handle */}
         <Box
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize results panel"
+          aria-valuenow={resultsWidth}
+          aria-valuemin={MIN_RESULTS_WIDTH}
+          aria-valuemax={MAX_RESULTS_WIDTH}
+          tabIndex={0}
           onMouseDown={handleMouseDown}
+          onKeyDown={handleKeyDown}
           sx={{
             width: 6,
             flexShrink: 0,

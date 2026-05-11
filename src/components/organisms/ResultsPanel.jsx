@@ -151,7 +151,7 @@ function SingleResults({
       </Box>
 
       {/* Actions */}
-      <ActionBar copyFormats={copyFormats} linkUrl={undefined} sx={{ mb: 2 }} />
+      <ActionBar copyFormats={copyFormats} sx={{ mb: 2 }} />
 
       {/* Summary table */}
       {isPatch ? (
@@ -246,7 +246,7 @@ function ComparisonResults({
         </Stack>
       </Box>
 
-      <ActionBar copyFormats={copyFormats} linkUrl={undefined} sx={{ mb: 2 }} />
+      <ActionBar copyFormats={copyFormats} sx={{ mb: 2 }} />
 
       {/* Comparison table */}
       <TableContainer component={Paper} variant="outlined" sx={{ mb: 2 }}>

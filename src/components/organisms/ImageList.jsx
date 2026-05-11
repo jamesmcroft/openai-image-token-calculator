@@ -33,8 +33,12 @@ export default function ImageList() {
   );
 
   const sync = () => {
-    if (comparisonMode) runComparison();
-    else runCalculation();
+    if (comparisonMode) {
+      runComparison();
+    } else {
+      const model = useBoundStore.getState().model;
+      if (model && typeof model === "object") runCalculation();
+    }
   };
 
   const handleAdd = () => {
