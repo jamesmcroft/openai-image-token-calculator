@@ -6,9 +6,9 @@
     "start_url": "/openai-image-token-calculator/?source=pwa",
     "scope": "/openai-image-token-calculator/",
     "display": "standalone",
-    "orientation": "portrait",
-    "background_color": "#F3F2F1",
-    "theme_color": "#0078D4",
+    "orientation": "any",
+    "background_color": "#F5F7FA",
+    "theme_color": "#0F6CBD",
     "icons": [
         {
             "src": "/openai-image-token-calculator/images/icon-72x72.png",
@@ -57,6 +57,34 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Quick Calculate",
+            "short_name": "Calculate",
+            "description": "Jump straight to single-model calculation",
+            "url": "/openai-image-token-calculator/?mode=single&source=shortcut",
+            "icons": [
+                {
+                    "src": "/openai-image-token-calculator/images/icon-96x96.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Compare Models",
+            "short_name": "Compare",
+            "description": "Compare token costs across multiple models",
+            "url": "/openai-image-token-calculator/?mode=compare&source=shortcut",
+            "icons": [
+                {
+                    "src": "/openai-image-token-calculator/images/icon-96x96.png",
+                    "sizes": "96x96",
+                    "type": "image/png"
+                }
+            ]
         }
     ]
 }
