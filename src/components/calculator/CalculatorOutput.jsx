@@ -22,6 +22,7 @@ import {
 import { useBoundStore } from "../../stores";
 import ModelComment from "./comparison/ModelComment";
 import CopyResultsButton from "./CopyResultsButton";
+import CopyLinkButton from "./CopyLinkButton";
 import CostProjection from "./CostProjection";
 import { formatResultsAsText, formatResultsAsTsv } from "../../utils/formatResults";
 
@@ -80,6 +81,7 @@ export default function CalculatorOutput() {
           <ModelComment comment={model?.comment} />
         </Stack>
         <CopyResultsButton formats={copyFormats} />
+        <CopyLinkButton />
       </Stack>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
         Results update as you change inputs

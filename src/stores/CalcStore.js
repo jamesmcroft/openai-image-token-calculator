@@ -14,6 +14,7 @@ export const calcStore = (set, get) => ({
   },
 
   addImage: (image) => set((state) => ({ images: [...state.images, image] })),
+  clearImages: () => set({ images: [] }),
   updateImage: (index, field, value) => {
     const newImages = [...get().images];
     newImages[index][field] = value;
