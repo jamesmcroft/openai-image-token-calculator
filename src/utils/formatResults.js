@@ -38,10 +38,11 @@ export function formatResultsAsText({
 
   lines.push(""); // blank separator
 
-  // Per-image lines
-  const paired = imageResults.map((result, i) => ({
+  // Per-image lines - carry original index through filtering
+  const paired = (imageResults ?? []).map((result, i) => ({
     result,
-    image: images[i],
+    image: (images ?? [])[i],
+    originalIndex: i,
   }));
 
   const validPairs = paired.filter(
@@ -52,7 +53,7 @@ export function formatResultsAsText({
       result.tokenization,
   );
 
-  validPairs.forEach(({ result, image }, i) => {
+  validPairs.forEach(({ result, image, originalIndex }) => {
     const origW = image?.width ?? "?";
     const origH = image?.height ?? "?";
     const qty = image?.multiplier ?? 1;
@@ -69,7 +70,7 @@ export function formatResultsAsText({
     }
 
     lines.push(
-      `Image ${i + 1}: ${origW}x${origH}, Qty ${qty} - Resized to ${resized} - ${detail} - ${tokens} tokens`,
+      `Image ${originalIndex + 1}: ${origW}x${origH}, Qty ${qty} - Resized to ${resized} - ${detail} - ${tokens} tokens`,
     );
   });
 
@@ -169,7 +170,7 @@ export function formatComparisonAsText({ images, comparisonResults }) {
   if (commented.length > 0) {
     lines.push("");
     for (const r of commented) {
-      lines.push(`Note [${r.model.name}]: ${r.model.comment}`);
+      lines.push(`Note [${r.model?.name ?? "Unknown"}]: ${r.model.comment}`);
     }
   }
 
@@ -200,9 +201,10 @@ export function formatResultsAsTsv({
     ),
   );
 
-  const paired = imageResults.map((result, i) => ({
+  const paired = (imageResults ?? []).map((result, i) => ({
     result,
-    image: images[i],
+    image: (images ?? [])[i],
+    originalIndex: i,
   }));
 
   const validPairs = paired.filter(
@@ -213,7 +215,7 @@ export function formatResultsAsTsv({
       result.tokenization,
   );
 
-  validPairs.forEach(({ result, image }, i) => {
+  validPairs.forEach(({ result, image, originalIndex }) => {
     const origSize = `${image?.width ?? "?"}x${image?.height ?? "?"}`;
     const qty = image?.multiplier ?? 1;
     const resized = `${result.resizedWidth}x${result.resizedHeight}`;
@@ -222,7 +224,7 @@ export function formatResultsAsTsv({
       : result.tokenization.totalTiles;
     const tokens = result.tokenization.imageTokens;
 
-    rows.push([i + 1, origSize, qty, resized, units, tokens].join("\t"));
+    rows.push([originalIndex + 1, origSize, qty, resized, units, tokens].join("\t"));
   });
 
   rows.push(""); // blank separator row

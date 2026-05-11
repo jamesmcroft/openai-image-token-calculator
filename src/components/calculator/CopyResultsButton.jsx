@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import {
   Button,
   Menu,
@@ -24,6 +24,9 @@ import {
 export default function CopyResultsButton({ formats }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [copyState, setCopyState] = useState("idle");
+  const menuId = useId();
+  const buttonId = useId();
+  const open = Boolean(anchorEl);
 
   const handleOpen = (e) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -67,24 +70,33 @@ export default function CopyResultsButton({ formats }) {
         ? "Copy failed"
         : "Copy results";
 
+  const isIdle = copyState === "idle";
+
   return (
     <>
       <Button
+        id={buttonId}
         size="small"
         variant="outlined"
         startIcon={icon}
-        endIcon={copyState === "idle" ? <ArrowDropDown /> : undefined}
+        endIcon={isIdle ? <ArrowDropDown /> : undefined}
         color={color}
-        onClick={copyState === "idle" ? handleOpen : undefined}
+        onClick={isIdle ? handleOpen : undefined}
+        disabled={!isIdle}
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
       >
         {label}
       </Button>
       <Menu
+        id={menuId}
         anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        open={open}
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
+        MenuListProps={{ "aria-labelledby": buttonId }}
       >
         <MenuItem onClick={() => handleCopy(formats.text)}>
           <ListItemIcon>

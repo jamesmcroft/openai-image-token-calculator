@@ -270,6 +270,55 @@ describe("formatResultsAsText", () => {
     expect(text).toContain("Total tokens: 0");
     expect(text).toContain("Azure OpenAI Image Token Calculator");
   });
+
+  it("preserves original image numbering when middle entry is filtered out", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [
+        { width: 1024, height: 768, multiplier: 1 },
+        { width: 0, height: 0, multiplier: 1 },
+        { width: 1920, height: 1080, multiplier: 1 },
+      ],
+      imageResults: [
+        {
+          resizedWidth: 1024,
+          resizedHeight: 768,
+          tokenization: { type: "patch", totalPatches: 768, imageTokens: 768 },
+        },
+        { resizedWidth: 0, resizedHeight: 0, tokenization: null },
+        {
+          resizedWidth: 1920,
+          resizedHeight: 1080,
+          tokenization: { type: "patch", totalPatches: 2040, imageTokens: 2040 },
+        },
+      ],
+      totalTokens: 2808,
+      totalCost: "0.00702",
+    });
+
+    expect(text).toContain("Image 1:");
+    expect(text).not.toContain("Image 2:");
+    expect(text).toContain("Image 3:");
+  });
+
+  it("handles undefined images array gracefully", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: undefined,
+      imageResults: [
+        {
+          resizedWidth: 512,
+          resizedHeight: 512,
+          tokenization: { type: "patch", totalPatches: 256, imageTokens: 256 },
+        },
+      ],
+      totalTokens: 256,
+      totalCost: "0.00064",
+    });
+
+    expect(text).toContain("Image 1:");
+    expect(text).toContain("?x?, Qty 1");
+  });
 });
 
 // ---------------------------------------------------------------------------
