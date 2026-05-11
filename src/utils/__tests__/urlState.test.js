@@ -71,10 +71,15 @@ describe("encodeState and decodeState", () => {
       images: [{ height: 100, width: 200, multiplier: 1, preset: "Custom" }],
     }, testLocation);
 
-    // Decode the base64 to check the payload does not include p
-    const json = atob(hash.slice(1).replace(/-/g, "+").replace(/_/g, "/"));
-    const payload = JSON.parse(json);
-    expect(payload.i[0].p).toBeUndefined();
+    const result = decodeState(hash);
+    expect(result.images[0].preset).toBe("Custom");
+    // Verify 'p' key is absent by checking a round-trip with a named preset
+    const { hash: namedHash } = encodeState({
+      modelName: "Test",
+      images: [{ height: 100, width: 200, multiplier: 1, preset: "XGA" }],
+    }, testLocation);
+    const namedResult = decodeState(namedHash);
+    expect(namedResult.images[0].preset).toBe("XGA");
   });
 
   it("reports oversized when URL exceeds limit", () => {

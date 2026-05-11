@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useBoundStore } from "../stores";
 import { encodeState, decodeState, findModelByName } from "../utils/urlState";
 
@@ -19,6 +19,7 @@ export default function useUrlState({ setModelName }) {
   const models = useBoundStore((s) => s.models);
   const setModel = useBoundStore((s) => s.setModel);
   const addImage = useBoundStore((s) => s.addImage);
+  const clearImages = useBoundStore((s) => s.clearImages);
   const setRequestsPerDay = useBoundStore((s) => s.setRequestsPerDay);
   const comparisonMode = useBoundStore((s) => s.comparisonMode);
   const setComparisonMode = useBoundStore((s) => s.setComparisonMode);
@@ -26,8 +27,8 @@ export default function useUrlState({ setModelName }) {
   const toggleModelSelection = useBoundStore((s) => s.toggleModelSelection);
 
   const hydratedRef = useRef(false);
-  const warningRef = useRef(null);
-  const oversizedRef = useRef(false);
+  const [warning, setWarning] = useState(null);
+  const [oversized, setOversized] = useState(false);
 
   // Restore state from URL hash on mount
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function useUrlState({ setModelName }) {
 
     if (result.error) {
       if (result.error !== "empty") {
-        warningRef.current = result.error;
+        setWarning(result.error);
       }
       hydratedRef.current = true;
       return;
@@ -50,7 +51,7 @@ export default function useUrlState({ setModelName }) {
     // Resolve model
     const modelObj = findModelByName(result.modelName, models);
     if (result.modelName && !modelObj) {
-      warningRef.current = `Model "${result.modelName}" was not found. It may have been renamed or removed.`;
+      setWarning(`Model "${result.modelName}" was not found. It may have been renamed or removed.`);
     }
 
     // Set state - single model (used when not in comparison mode)
@@ -60,23 +61,17 @@ export default function useUrlState({ setModelName }) {
     }
 
     // Clear existing images and add restored ones
-    const store = useBoundStore.getState();
-    while (store.images.length > 0) {
-      useBoundStore.getState().removeImage(0);
-    }
+    clearImages();
 
     for (const img of result.images) {
       addImage(img);
     }
 
-    if (result.requestsPerDay > 0) {
-      setRequestsPerDay(result.requestsPerDay);
-    }
+    setRequestsPerDay(result.requestsPerDay);
 
     // Restore comparison mode
     if (result.comparisonMode) {
       setComparisonMode(true);
-      // Resolve and select each model by name
       const missingModels = [];
       for (const name of result.selectedModelNames) {
         const obj = findModelByName(name, models);
@@ -87,7 +82,7 @@ export default function useUrlState({ setModelName }) {
         }
       }
       if (missingModels.length > 0) {
-        warningRef.current = `Some models were not found: ${missingModels.join(", ")}. They may have been renamed or removed.`;
+        setWarning(`Some models were not found: ${missingModels.join(", ")}. They may have been renamed or removed.`);
       }
       setTimeout(() => {
         useBoundStore.getState().runComparison();
@@ -103,6 +98,20 @@ export default function useUrlState({ setModelName }) {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-dismiss warning after 8 seconds
+  useEffect(() => {
+    if (!warning) return;
+    const timer = setTimeout(() => setWarning(null), 8000);
+    return () => clearTimeout(timer);
+  }, [warning]);
+
+  // Clear warning when user changes state after hydration
+  useEffect(() => {
+    if (hydratedRef.current && warning) {
+      setWarning(null);
+    }
+  }, [model, images, comparisonMode, selectedModels]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Update URL hash when state changes (debounced)
   const timerRef = useRef(null);
 
@@ -113,13 +122,14 @@ export default function useUrlState({ setModelName }) {
     const hasContent = modelName || images.length > 0 || (comparisonMode && selectedModels.length > 0);
     if (!hasContent) {
       if (window.location.hash) {
-        history.replaceState(null, "", window.location.pathname);
+        const basePath = `${window.location.pathname}${window.location.search}`;
+        history.replaceState(null, "", basePath);
       }
-      oversizedRef.current = false;
+      setOversized(false);
       return;
     }
 
-    const { hash, oversized } = encodeState({
+    const { hash, oversized: isOversized } = encodeState({
       modelName,
       images,
       requestsPerDay,
@@ -127,10 +137,11 @@ export default function useUrlState({ setModelName }) {
       selectedModelNames: selectedModels.map((m) => m.name),
     });
 
-    oversizedRef.current = oversized;
+    setOversized(isOversized);
 
-    if (!oversized) {
-      history.replaceState(null, "", `${window.location.pathname}${hash}`);
+    if (!isOversized) {
+      const basePath = `${window.location.pathname}${window.location.search}`;
+      history.replaceState(null, "", `${basePath}${hash}`);
     }
   }, [model, images, requestsPerDay, comparisonMode, selectedModels]);
 
@@ -142,8 +153,5 @@ export default function useUrlState({ setModelName }) {
     };
   }, [updateHash]);
 
-  return {
-    warning: warningRef.current,
-    oversized: oversizedRef.current,
-  };
+  return { warning, oversized };
 }
