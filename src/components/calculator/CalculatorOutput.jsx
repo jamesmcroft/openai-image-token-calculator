@@ -22,6 +22,7 @@ import {
 import { useBoundStore } from "../../stores";
 import ModelComment from "./comparison/ModelComment";
 import CopyResultsButton from "./CopyResultsButton";
+import CostProjection from "./CostProjection";
 import { formatResultsAsText, formatResultsAsTsv } from "../../utils/formatResults";
 
 export default function CalculatorOutput() {
@@ -30,12 +31,13 @@ export default function CalculatorOutput() {
   const model = useBoundStore((s) => s.model);
   const images = useBoundStore((s) => s.images);
   const imageResults = useBoundStore((s) => s.imageResults);
+  const requestsPerDay = useBoundStore((s) => s.requestsPerDay);
 
   const copyFormats = {
     text: () =>
-      formatResultsAsText({ model, images, imageResults, totalTokens, totalCost }),
+      formatResultsAsText({ model, images, imageResults, totalTokens, totalCost, requestsPerDay }),
     table: () =>
-      formatResultsAsTsv({ model, images, imageResults, totalTokens, totalCost }),
+      formatResultsAsTsv({ model, images, imageResults, totalTokens, totalCost, requestsPerDay }),
   };
 
   if (totalTokens === null) {
@@ -100,6 +102,7 @@ export default function CalculatorOutput() {
       )}
 
       <ImageBreakdownList imageResults={imageResults} isPatch={isPatch} />
+      <CostProjection />
     </Box>
   );
 }

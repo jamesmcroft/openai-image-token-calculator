@@ -4,8 +4,14 @@ export const calcStore = (set, get) => ({
   imageResults: [],
   totalTokens: null,
   totalCost: null,
+  requestsPerDay: 0,
 
   setModel: (model) => set({ model }),
+
+  setRequestsPerDay: (value) => {
+    const parsed = Number.parseInt(value, 10);
+    set({ requestsPerDay: Number.isFinite(parsed) && parsed > 0 ? parsed : 0 });
+  },
 
   addImage: (image) => set((state) => ({ images: [...state.images, image] })),
   updateImage: (index, field, value) => {

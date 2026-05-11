@@ -15,19 +15,21 @@ import { CompareArrowsOutlined } from "@mui/icons-material";
 import { useBoundStore } from "../../../stores";
 import ComparisonRow from "./ComparisonRow";
 import CopyResultsButton from "../CopyResultsButton";
+import CostProjection from "../CostProjection";
 import { formatComparisonAsText, formatComparisonAsTsv } from "../../../utils/formatResults";
 
 export default function ComparisonTable() {
   const comparisonResults = useBoundStore((s) => s.comparisonResults);
   const images = useBoundStore((s) => s.images);
+  const requestsPerDay = useBoundStore((s) => s.requestsPerDay);
   const expandedModelName = useBoundStore((s) => s.expandedModelName);
   const setExpandedModel = useBoundStore((s) => s.setExpandedModel);
   const sortOrder = useBoundStore((s) => s.comparisonSortOrder);
   const toggleSort = useBoundStore((s) => s.toggleComparisonSortOrder);
 
   const copyFormats = {
-    text: () => formatComparisonAsText({ images, comparisonResults }),
-    table: () => formatComparisonAsTsv({ comparisonResults }),
+    text: () => formatComparisonAsText({ images, comparisonResults, requestsPerDay }),
+    table: () => formatComparisonAsTsv({ comparisonResults, requestsPerDay }),
   };
 
   if (comparisonResults.length === 0) {
@@ -82,6 +84,7 @@ export default function ComparisonTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      <CostProjection />
     </Box>
   );
 }
