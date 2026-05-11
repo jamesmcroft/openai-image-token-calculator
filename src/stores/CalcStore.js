@@ -9,7 +9,7 @@ export const calcStore = (set, get) => ({
   setModel: (model) => set({ model }),
 
   setRequestsPerDay: (value) => {
-    const parsed = Number.parseInt(value, 10);
+    const parsed = Math.trunc(Number(value));
     set({ requestsPerDay: Number.isFinite(parsed) && parsed > 0 ? parsed : 0 });
   },
 

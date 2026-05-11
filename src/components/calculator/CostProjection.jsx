@@ -43,7 +43,14 @@ export default function CostProjection() {
         size="small"
         value={requestsPerDay === 0 ? "" : requestsPerDay}
         onChange={(e) => setRequestsPerDay(e.target.value)}
-        slotProps={{ htmlInput: { min: 0, step: 1 } }}
+        slotProps={{
+          input: {
+            inputProps: {
+              min: 0,
+              step: 1,
+            },
+          },
+        }}
         sx={{ width: 180, mb: 2 }}
       />
 
@@ -120,14 +127,14 @@ function ComparisonProjection({ comparisonResults, requestsPerDay }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {comparisonResults.map((r) => {
+            {comparisonResults.map((r, index) => {
               const unitCost = Number.parseFloat(r.totalCost ?? "0");
               const valid = Number.isFinite(unitCost);
               const daily = valid ? unitCost * requestsPerDay : 0;
               const monthly = daily * 30;
 
               return (
-                <TableRow key={r.model?.name}>
+                <TableRow key={`${r.model?.name ?? "unknown"}-${index}`}>
                   <TableCell>{r.model?.name ?? "Unknown"}</TableCell>
                   <TableCell align="right">
                     {valid ? currencyFormat.format(unitCost) : "-"}

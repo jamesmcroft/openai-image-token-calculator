@@ -360,6 +360,38 @@ describe("formatResultsAsText", () => {
 
     expect(text).not.toContain("Cost Projection");
   });
+
+  it("excludes cost projection when totalCost is 0", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [{ width: 100, height: 100, multiplier: 1 }],
+      imageResults: [
+        {
+          resizedWidth: 100,
+          resizedHeight: 100,
+          tokenization: { type: "patch", totalPatches: 16, imageTokens: 0 },
+        },
+      ],
+      totalTokens: 0,
+      totalCost: "0",
+      requestsPerDay: 1000,
+    });
+
+    expect(text).not.toContain("Cost Projection");
+  });
+
+  it("excludes cost projection when totalCost is null", () => {
+    const text = formatResultsAsText({
+      model: patchModel,
+      images: [],
+      imageResults: [],
+      totalTokens: 0,
+      totalCost: null,
+      requestsPerDay: 500,
+    });
+
+    expect(text).not.toContain("Cost Projection");
+  });
 });
 
 // ---------------------------------------------------------------------------

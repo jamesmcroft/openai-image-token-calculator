@@ -11,7 +11,7 @@ const currencyFormat = new Intl.NumberFormat(undefined, {
  * Build a plain-text summary of the calculation results suitable for
  * pasting into documents, messages, or cost analyses.
  *
- * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number }} params
+ * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number, requestsPerDay?: number }} params
  * @returns {string}
  */
 export function formatResultsAsText({
@@ -85,9 +85,9 @@ export function formatResultsAsText({
   lines.push(`Total tokens: ${formattedTokens}`);
   lines.push(`Estimated cost: ${formattedCost} (${costRate})`);
 
-  // Cost projection (only when non-zero)
+  // Cost projection (only when requestsPerDay > 0 and cost is positive)
   const unitCost = Number.parseFloat(totalCost ?? "0");
-  if (requestsPerDay > 0 && Number.isFinite(unitCost)) {
+  if (requestsPerDay > 0 && Number.isFinite(unitCost) && unitCost > 0) {
     const dailyCost = unitCost * requestsPerDay;
     const monthlyCost = dailyCost * 30;
     lines.push("");
@@ -104,7 +104,7 @@ export function formatResultsAsText({
  * Build a plain-text comparison table of multiple model results suitable
  * for pasting into documents, messages, or cost analyses.
  *
- * @param {{ images: object[], comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[] }} params
+ * @param {{ images: object[], comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[], requestsPerDay?: number }} params
  * @returns {string}
  */
 export function formatComparisonAsText({ images, comparisonResults, requestsPerDay }) {
@@ -193,7 +193,7 @@ export function formatComparisonAsText({ images, comparisonResults, requestsPerD
     lines.push(`Cost Projection (${numberFormat.format(requestsPerDay)} requests/day)`);
     for (const r of comparisonResults) {
       const unitCost = Number.parseFloat(r.totalCost ?? "0");
-      if (!Number.isFinite(unitCost)) continue;
+      if (!Number.isFinite(unitCost) || unitCost <= 0) continue;
       const daily = unitCost * requestsPerDay;
       const monthly = daily * 30;
       lines.push(
@@ -209,7 +209,7 @@ export function formatComparisonAsText({ images, comparisonResults, requestsPerD
  * Build a TSV (tab-separated values) version of single-model results
  * that pastes cleanly into spreadsheet applications.
  *
- * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number }} params
+ * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number, requestsPerDay?: number }} params
  * @returns {string}
  */
 export function formatResultsAsTsv({
@@ -267,9 +267,9 @@ export function formatResultsAsTsv({
     rows.push(["Model", model.name].join("\t"));
   }
 
-  // Cost projection (only when non-zero)
+  // Cost projection (only when requestsPerDay > 0 and cost is positive)
   const unitCost = Number.parseFloat(totalCost ?? "0");
-  if (requestsPerDay > 0 && Number.isFinite(unitCost)) {
+  if (requestsPerDay > 0 && Number.isFinite(unitCost) && unitCost > 0) {
     const dailyCost = unitCost * requestsPerDay;
     const monthlyCost = dailyCost * 30;
     rows.push("");
@@ -285,7 +285,7 @@ export function formatResultsAsTsv({
  * Build a TSV (tab-separated values) version of comparison results
  * that pastes cleanly into spreadsheet applications.
  *
- * @param {{ comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[] }} params
+ * @param {{ comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[], requestsPerDay?: number }} params
  * @returns {string}
  */
 export function formatComparisonAsTsv({ comparisonResults, requestsPerDay }) {
@@ -314,9 +314,13 @@ export function formatComparisonAsTsv({ comparisonResults, requestsPerDay }) {
     const cols = [name, tokenType, tokens, cost, rate, retirement];
     if (hasProjection) {
       const unitCost = Number.parseFloat(r.totalCost ?? "0");
-      const daily = Number.isFinite(unitCost) ? unitCost * requestsPerDay : 0;
+      const valid = Number.isFinite(unitCost) && unitCost > 0;
+      const daily = valid ? unitCost * requestsPerDay : 0;
       const monthly = daily * 30;
-      cols.push(currencyFormat.format(daily), currencyFormat.format(monthly));
+      cols.push(
+        valid ? currencyFormat.format(daily) : "-",
+        valid ? currencyFormat.format(monthly) : "-",
+      );
     }
     rows.push(cols.join("\t"));
   }
