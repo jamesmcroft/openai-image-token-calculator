@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -13,20 +13,50 @@ import {
   Chip,
   Collapse,
   IconButton,
+  Button,
 } from "@mui/material";
 import {
   BarChartOutlined,
   ExpandMore,
   ExpandLess,
+  ContentCopy,
+  Check,
 } from "@mui/icons-material";
 import { useBoundStore } from "../../stores";
 import ModelComment from "./comparison/ModelComment";
+import { formatResultsAsText } from "../../utils/formatResults";
 
 export default function CalculatorOutput() {
   const totalTokens = useBoundStore((s) => s.totalTokens);
   const totalCost = useBoundStore((s) => s.totalCost);
   const model = useBoundStore((s) => s.model);
+  const images = useBoundStore((s) => s.images);
   const imageResults = useBoundStore((s) => s.imageResults);
+
+  const [copyState, setCopyState] = useState("idle"); // "idle" | "copied" | "failed"
+
+  const handleCopy = useCallback(async () => {
+    const text = formatResultsAsText({
+      model,
+      images,
+      imageResults,
+      totalTokens,
+      totalCost,
+    });
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
+  }, [model, images, imageResults, totalTokens, totalCost]);
+
+  useEffect(() => {
+    if (copyState === "idle") return;
+    const timer = setTimeout(() => setCopyState("idle"), 2000);
+    return () => clearTimeout(timer);
+  }, [copyState]);
 
   if (totalTokens === null) {
     return (
@@ -65,6 +95,20 @@ export default function CalculatorOutput() {
           />
         )}
         <ModelComment comment={model?.comment} />
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={copyState === "copied" ? <Check /> : <ContentCopy />}
+          color={copyState === "failed" ? "error" : copyState === "copied" ? "success" : "primary"}
+          onClick={handleCopy}
+          sx={{ ml: "auto" }}
+        >
+          {copyState === "copied"
+            ? "Copied!"
+            : copyState === "failed"
+              ? "Copy failed"
+              : "Copy results"}
+        </Button>
       </Stack>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
         Results update as you change inputs
