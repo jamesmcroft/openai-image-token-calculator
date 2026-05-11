@@ -15,6 +15,7 @@ import { CompareArrowsOutlined } from "@mui/icons-material";
 import { useBoundStore } from "../../../stores";
 import ComparisonRow from "./ComparisonRow";
 import CopyResultsButton from "../CopyResultsButton";
+import CopyLinkButton from "../CopyLinkButton";
 import CostProjection from "../CostProjection";
 import { formatComparisonAsText, formatComparisonAsTsv } from "../../../utils/formatResults";
 
@@ -48,6 +49,7 @@ export default function ComparisonTable() {
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
         <Typography variant="h6" sx={{ flex: 1 }}>Comparison Results</Typography>
         <CopyResultsButton formats={copyFormats} />
+        <CopyLinkButton />
       </Stack>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: "block" }}>
         Click the Estimated Cost header to toggle sort order. Click a row to

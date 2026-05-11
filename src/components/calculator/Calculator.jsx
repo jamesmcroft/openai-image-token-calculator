@@ -4,7 +4,9 @@ import ModelSelector from "./ModelSelector";
 import ImageEditor from "./ImageEditor";
 import CalculatorOutput from "./CalculatorOutput";
 import ComparisonTable from "./comparison/ComparisonTable";
+import useUrlState from "../../hooks/useUrlState";
 import {
+  Alert,
   Box,
   Stack,
   Typography,
@@ -18,6 +20,8 @@ export default function Calculator() {
   const runCalculation = useBoundStore((s) => s.runCalculation);
   const comparisonMode = useBoundStore((s) => s.comparisonMode);
   const setComparisonMode = useBoundStore((s) => s.setComparisonMode);
+
+  const { warning, oversized } = useUrlState({ setModelName });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -79,6 +83,18 @@ export default function Calculator() {
         </Typography>
       </Stack>
       <ModelSelector modelName={modelName} setModelName={setModelName} />
+      {warning && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          {warning}
+        </Alert>
+      )}
+      {oversized && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          The current configuration is too large to encode in the URL.
+          The shareable link will not update until the configuration is
+          simplified.
+        </Alert>
+      )}
       <ImageEditor />
       {comparisonMode ? <ComparisonTable /> : <CalculatorOutput />}
     </Box>
