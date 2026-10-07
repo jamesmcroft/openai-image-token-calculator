@@ -7,24 +7,33 @@ describe("new vision models", () => {
   const newGroups = ["GPT-6.1", "GPT-6", "GPT-5.6"];
   const prices = {
     "GPT-6.1 Sol (Global)": 2,
-    "GPT-6.1 Sol (US Data Zone)": 2.2,
-    "GPT-6.1 Sol (EU Data Zone)": 2.4,
-    "GPT-6.1 Sol (APAC Data Zone)": 2.4,
+    "GPT-6.1 Sol (Data Zone)": 2.2,
+    "GPT-6.1 Sol (Long, Global)": 4,
+    "GPT-6.1 Sol (Long, Data Zone)": 4.4,
     "GPT-6 Astra (Global)": 10,
-    "GPT-6 Astra (US Data Zone)": 11,
-    "GPT-6 Astra (EU Data Zone)": 12,
+    "GPT-6 Astra (Data Zone)": 11,
+    "GPT-6 Astra (Long, Global)": 20,
+    "GPT-6 Astra (Long, Data Zone)": 22,
     "GPT-6 Sol (Global)": 2,
-    "GPT-6 Sol (US Data Zone)": 2.2,
-    "GPT-6 Sol (EU Data Zone)": 2.4,
+    "GPT-6 Sol (Data Zone)": 2.2,
+    "GPT-6 Sol (Long, Global)": 4,
+    "GPT-6 Sol (Long, Data Zone)": 4.4,
     "GPT-6 Luna (Global)": 0.1,
-    "GPT-6 Luna (US Data Zone)": 0.11,
-    "GPT-6 Luna (EU Data Zone)": 0.12,
+    "GPT-6 Luna (Data Zone)": 0.11,
+    "GPT-6 Luna (Long, Global)": 0.2,
+    "GPT-6 Luna (Long, Data Zone)": 0.22,
     "GPT-5.6 Sol (Global)": 4,
     "GPT-5.6 Sol (Data Zone)": 4.4,
+    "GPT-5.6 Sol (Long, Global)": 8,
+    "GPT-5.6 Sol (Long, Data Zone)": 8.8,
     "GPT-5.6 Terra (Global)": 2,
     "GPT-5.6 Terra (Data Zone)": 2.2,
+    "GPT-5.6 Terra (Long, Global)": 4,
+    "GPT-5.6 Terra (Long, Data Zone)": 4.4,
     "GPT-5.6 Luna (Global)": 0.2,
     "GPT-5.6 Luna (Data Zone)": 0.22,
+    "GPT-5.6 Luna (Long, Global)": 0.4,
+    "GPT-5.6 Luna (Long, Data Zone)": 0.44,
   };
 
   it("lists the image-capable GPT-5.6 and GPT-6 models with input rates", () => {
@@ -73,5 +82,26 @@ describe("new vision models", () => {
     expect(result.imageResults[0].tokenization.totalPatches).toBe(5000);
     expect(result.totalTokens).toBe(6000);
     expect(result.totalCost).toBe("0.06000");
+  });
+
+  it("includes the other advertised image input rates", () => {
+    const expected = {
+      "GPT-5.5 (Long, Global)": 10,
+      "GPT-5.5 (Long, Data Zone)": 11,
+      "GPT-5.4 (Long, Global)": 5,
+      "GPT-5.4 mini (Data Zone)": 0.83,
+      "image-2.5-flare (Global)": 8,
+      "image-2.5-sunburst (Global)": 8,
+    };
+    const available = models.flatMap((group) => group.items);
+
+    for (const [name, price] of Object.entries(expected)) {
+      const model = available.find((item) => item.name === name);
+      expect(model?.costPerMillionTokens).toBe(price);
+      expect(Number(calculateForModel(
+        model,
+        [{ height: 1024, width: 1024, multiplier: 1 }],
+      ).totalCost)).toBeGreaterThan(0);
+    }
   });
 });

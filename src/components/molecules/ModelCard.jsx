@@ -28,8 +28,7 @@ export default function ModelCard({ model, selected, onSelect, selectable, sx })
               <Typography
                 variant="body2"
                 fontWeight={600}
-                noWrap
-                sx={{ flex: 1, minWidth: 0 }}
+                sx={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}
               >
                 {model.name}
               </Typography>
