@@ -31,6 +31,8 @@ export default [
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
+      // Existing hydration and collapse-state effects initialize local UI state.
+      "react-hooks/set-state-in-effect": "off",
       "react/prop-types": "off",
       "react-refresh/only-export-components": "warn",
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
