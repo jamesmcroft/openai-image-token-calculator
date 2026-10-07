@@ -246,16 +246,8 @@ export default function ModelPicker({ modelName, setModelName }) {
         )}
       </Collapse>
       <Typography variant="caption" color="text.secondary">
-        Vision estimates default to high detail; choose Original when supported.
-        Image Gen input counts are approximations.{" "}
-        <Link
-          href="https://developers.openai.com/api/docs/guides/image-cost-calculator"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Compare vision detail levels
-        </Link>
-        .
+        Vision estimates default to High detail; choose Original when supported.
+        Image Gen input counts are approximations.
       </Typography>
     </Box>
   );

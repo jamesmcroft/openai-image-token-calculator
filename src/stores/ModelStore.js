@@ -21,7 +21,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 2.0,
         },
         {
@@ -30,7 +30,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 2.2,
         },
         {
@@ -39,7 +39,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 4.0,
         },
         {
@@ -48,7 +48,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 4.4,
         },
       ],
@@ -98,7 +98,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 2.0,
         },
         {
@@ -107,7 +107,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 2.2,
         },
         {
@@ -116,7 +116,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 4.0,
         },
         {
@@ -125,7 +125,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 4.4,
         },
         {
@@ -134,7 +134,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 0.1,
         },
         {
@@ -143,7 +143,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 0.11,
         },
         {
@@ -152,7 +152,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 0.2,
         },
         {
@@ -161,7 +161,7 @@ export const modelStore = (_set, _get) => ({
           patchSize: 32,
           patchBudget: 2500,
           tokenMultiplier: 1.2,
-          maxImageDimension: 2048,
+          maxImageDimension: 65535,
           costPerMillionTokens: 0.22,
         },
       ],
@@ -349,6 +349,15 @@ export const modelStore = (_set, _get) => ({
           tokenMultiplier: 1.2,
           maxImageDimension: 2048,
           costPerMillionTokens: 5.0,
+        },
+        {
+          name: "GPT-5.4 (Long, Data Zone)",
+          tokenizationType: "patch",
+          patchSize: 32,
+          patchBudget: 2500,
+          tokenMultiplier: 1.2,
+          maxImageDimension: 2048,
+          costPerMillionTokens: 5.5,
         },
         {
           name: "GPT-5.4 mini (Global)",

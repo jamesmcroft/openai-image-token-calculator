@@ -58,7 +58,7 @@ describe("new vision models", () => {
       expect(model.patchSize).toBe(32);
       expect(model.patchBudget).toBe(2500);
       expect(model.tokenMultiplier).toBe(1.2);
-      expect(model.maxImageDimension).toBe(model.name.startsWith("GPT-6 Astra") ? 65535 : 2048);
+      expect(model.maxImageDimension).toBe(model.name.startsWith("GPT-5.6 ") ? 2048 : 65535);
       const result = calculateForModel(
         model,
         [{ height: 1024, width: 1024, multiplier: 1 }],
@@ -100,6 +100,26 @@ describe("new vision models", () => {
       expect(result.imageResults[0].resizedHeight).toBe(resizedHeight);
       expect(result.imageResults[0].resizedWidth).toBe(resizedWidth);
     }
+  });
+
+  it("retains panoramic patches for GPT-6 estimates without an assumed 2048px cap", () => {
+    const additions = models
+      .filter((group) => ["GPT-6", "GPT-6.1"].includes(group.name))
+      .flatMap((group) => group.items);
+
+    for (const model of additions) {
+      const result = calculateForModel(model, [
+        { height: 32, width: 4096, multiplier: 1 },
+      ]);
+      expect(result.imageResults[0].resizedWidth).toBe(4096);
+      expect(result.imageResults[0].tokenization.totalPatches).toBe(128);
+      expect(result.totalTokens).toBe(154);
+    }
+
+    const gpt56 = models.find((group) => group.name === "GPT-5.6").items[0];
+    expect(calculateForModel(gpt56, [
+      { height: 32, width: 4096, multiplier: 1 },
+    ]).totalTokens).toBe(77);
   });
 
   it("uses OpenAI's high-detail budgets and multipliers for existing patch models", () => {
@@ -202,6 +222,7 @@ describe("new vision models", () => {
       "GPT-5.5 (Long, Global)": 10,
       "GPT-5.5 (Long, Data Zone)": 11,
       "GPT-5.4 (Long, Global)": 5,
+      "GPT-5.4 (Long, Data Zone)": 5.5,
       "GPT-5.4 mini (Data Zone)": 0.83,
       "image-2.5-flare (Global)": 8,
       "image-2.5-sunburst (Global)": 8,
