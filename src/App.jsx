@@ -21,6 +21,7 @@ import ExplanationDrawer from "./components/organisms/ExplanationDrawer";
 import Footer from "./components/layout/Footer";
 import useUrlState from "./hooks/useUrlState";
 import { useBoundStore } from "./stores";
+import { getOriginalDetail } from "./stores/ModelStore";
 import { useMemo, useState, useEffect } from "react";
 
 export default function App() {
@@ -46,6 +47,12 @@ export default function App() {
   const [explanationOpen, setExplanationOpen] = useState(false);
 
   const comparisonMode = useBoundStore((s) => s.comparisonMode);
+  const model = useBoundStore((s) => s.model);
+  const selectedModels = useBoundStore((s) => s.selectedModels);
+  const imageDetail = useBoundStore((s) => s.imageDetail);
+  const setImageDetail = useBoundStore((s) => s.setImageDetail);
+  const calculationError = useBoundStore((s) => s.calculationError);
+  const comparisonError = useBoundStore((s) => s.comparisonError);
   const setComparisonMode = useBoundStore((s) => s.setComparisonMode);
   const runCalculation = useBoundStore((s) => s.runCalculation);
 
@@ -136,6 +143,31 @@ export default function App() {
       </Typography>
       <Box sx={{ mb: 3 }}>
         <ModelPicker modelName={modelName} setModelName={setModelName} />
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1.5 }}>
+          <Typography variant="body2">Image detail</Typography>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={imageDetail}
+            onChange={(_, detail) => { if (detail) setImageDetail(detail); }}
+            aria-label="Image detail"
+          >
+            <ToggleButton value="high">High</ToggleButton>
+            <ToggleButton
+              value="original"
+              disabled={comparisonMode
+                ? selectedModels.length === 0 || selectedModels.some((item) => !getOriginalDetail(item))
+                : !getOriginalDetail(model)}
+            >
+              Original
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+        <Typography variant="caption" color="text.secondary">
+          Original may resize large images or reject them above 30,000 patches.
+          Available only for models with published Original limits; selecting
+          an unsupported model switches back to High.
+        </Typography>
       </Box>
 
       {/* Step 2: Image configuration */}
@@ -144,6 +176,11 @@ export default function App() {
       </Typography>
       <Box sx={{ mb: 3 }}>
         <ImageList />
+        {(comparisonMode ? comparisonError : calculationError) && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {comparisonMode ? comparisonError : calculationError}
+          </Alert>
+        )}
       </Box>
 
       {/* Footer */}

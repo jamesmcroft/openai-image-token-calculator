@@ -5,11 +5,11 @@ const MAX_URL_LENGTH = 2000;
 /**
  * Encode calculator state into a URL-safe base64 hash string.
  *
- * @param {{ modelName: string, images: { height: number, width: number, multiplier: number, preset?: string }[], requestsPerDay?: number, comparisonMode?: boolean, selectedModelNames?: string[] }} state
+ * @param {{ modelName: string, images: { height: number, width: number, multiplier: number, preset?: string }[], requestsPerDay?: number, comparisonMode?: boolean, selectedModelNames?: string[], imageDetail?: "high"|"original" }} state
  * @param {{ origin?: string, pathname?: string }} location - optional, defaults to window.location
  * @returns {{ hash: string, oversized: boolean }}
  */
-export function encodeState({ modelName, images, requestsPerDay, comparisonMode, selectedModelNames }, location) {
+export function encodeState({ modelName, images, requestsPerDay, comparisonMode, selectedModelNames, imageDetail }, location) {
   const payload = {
     v: SCHEMA_VERSION,
     m: modelName || "",
@@ -23,6 +23,9 @@ export function encodeState({ modelName, images, requestsPerDay, comparisonMode,
 
   if (requestsPerDay && requestsPerDay > 0) {
     payload.r = requestsPerDay;
+  }
+  if (imageDetail === "original") {
+    payload.d = "original";
   }
 
   if (comparisonMode) {
@@ -50,7 +53,7 @@ export function encodeState({ modelName, images, requestsPerDay, comparisonMode,
  * Decode and validate a URL hash string into calculator state.
  *
  * @param {string} hash - The location.hash value (including the # prefix)
- * @returns {{ modelName: string, images: { height: number, width: number, multiplier: number, preset: string }[], requestsPerDay: number } | { error: string }}
+ * @returns {{ modelName: string, images: { height: number, width: number, multiplier: number, preset: string }[], requestsPerDay: number, imageDetail: string } | { error: string }}
  */
 export function decodeState(hash) {
   if (!hash || hash.length <= 1) {
@@ -80,6 +83,9 @@ export function decodeState(hash) {
   if (payload.v !== SCHEMA_VERSION) {
     return { error: `Unsupported URL state version: ${payload.v}` };
   }
+  if (payload.d !== undefined && payload.d !== "high" && payload.d !== "original") {
+    return { error: `Unsupported image detail: ${payload.d}` };
+  }
 
   const modelName = typeof payload.m === "string" ? payload.m : "";
 
@@ -101,7 +107,7 @@ export function decodeState(hash) {
     ? payload.ms.filter((n) => typeof n === "string")
     : [];
 
-  return { modelName, images, requestsPerDay, comparisonMode, selectedModelNames };
+  return { modelName, images, requestsPerDay, comparisonMode, selectedModelNames, imageDetail: payload.d ?? "high" };
 }
 
 /**

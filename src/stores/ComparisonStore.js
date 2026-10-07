@@ -1,9 +1,11 @@
 import { calculateForModel } from "./CalcStore";
+import { getOriginalDetail } from "./ModelStore";
 
 export const comparisonStore = (set, get) => ({
   comparisonMode: false,
   selectedModels: [],
   comparisonResults: [],
+  comparisonError: null,
   expandedModelName: null,
   comparisonSortOrder: "asc",
 
@@ -18,6 +20,7 @@ export const comparisonStore = (set, get) => ({
         comparisonMode: true,
         selectedModels: carryOver,
         comparisonResults: [],
+        comparisonError: null,
         expandedModelName: null,
         comparisonSortOrder: "asc",
       });
@@ -37,6 +40,7 @@ export const comparisonStore = (set, get) => ({
         comparisonMode: false,
         selectedModels: [],
         comparisonResults: [],
+        comparisonError: null,
         expandedModelName: null,
         comparisonSortOrder: "asc",
         model: cheapest ?? "",
@@ -56,11 +60,17 @@ export const comparisonStore = (set, get) => ({
     const next = exists
       ? current.filter((m) => m.name !== model.name)
       : [...current, model];
-    set({ selectedModels: next });
+    set({
+      selectedModels: next,
+      imageDetail: get().imageDetail === "original" && next.some((item) => !getOriginalDetail(item))
+        ? "high"
+        : get().imageDetail,
+      comparisonError: null,
+    });
   },
 
   clearSelectedModels: () => {
-    set({ selectedModels: [], comparisonResults: [], expandedModelName: null });
+    set({ selectedModels: [], comparisonResults: [], expandedModelName: null, comparisonError: null });
   },
 
   toggleComparisonSortOrder: () => {
@@ -75,26 +85,34 @@ export const comparisonStore = (set, get) => ({
   },
 
   runComparison: () => {
-    const { selectedModels, images, comparisonSortOrder } = get();
+    const { selectedModels, images, comparisonSortOrder, imageDetail } = get();
     if (selectedModels.length === 0 || images.length === 0) {
-      set({ comparisonResults: [], expandedModelName: null });
+      set({ comparisonResults: [], expandedModelName: null, comparisonError: null });
       return;
     }
 
-    const results = selectedModels.map((model) => {
-      const { totalTokens, totalCost, imageResults } = calculateForModel(
-        model,
-        images
-      );
-      return { model, totalTokens, totalCost, imageResults };
-    });
+    let results;
+    try {
+      results = selectedModels.map((model) => {
+        const { totalTokens, totalCost, imageResults } = calculateForModel(
+          model,
+          images,
+          imageDetail
+        );
+        return { model, totalTokens, totalCost, imageResults };
+      });
+    } catch (error) {
+      if (!(error instanceof RangeError)) throw error;
+      set({ comparisonResults: [], comparisonError: error.message });
+      return;
+    }
 
     results.sort((a, b) =>
       comparisonSortOrder === "asc"
         ? Number(a.totalCost) - Number(b.totalCost)
         : Number(b.totalCost) - Number(a.totalCost)
     );
-    set({ comparisonResults: results });
+    set({ comparisonResults: results, comparisonError: null });
   },
 
   setExpandedModel: (name) => {

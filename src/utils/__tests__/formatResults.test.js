@@ -26,6 +26,33 @@ const tileModel = {
   costPerMillionTokens: 2.5,
 };
 
+it("labels image detail in exported single and comparison results", () => {
+  const single = {
+    model: patchModel,
+    images: [],
+    imageResults: [],
+    totalTokens: 12000,
+    totalCost: "0.03000",
+    imageDetail: "original",
+  };
+  const comparison = {
+    images: [],
+    comparisonResults: [{
+      model: patchModel,
+      totalTokens: 12000,
+      totalCost: "0.03000",
+      imageResults: [],
+    }],
+    imageDetail: "original",
+  };
+
+  expect(formatResultsAsText(single)).toContain("Image detail: Original");
+  expect(formatResultsAsTsv(single)).toContain("Image detail\tOriginal");
+  expect(formatComparisonAsText(comparison)).toContain("Image detail: Original");
+  expect(formatComparisonAsTsv(comparison)).toContain("Image Detail");
+  expect(formatComparisonAsTsv(comparison)).toContain("\tOriginal");
+});
+
 describe("formatResultsAsText", () => {
   it("formats patch-based results correctly", () => {
     const text = formatResultsAsText({

@@ -49,6 +49,7 @@ export default function ResultsPanel({ onOpenExplanation }) {
   const totalTokens = useBoundStore((s) => s.totalTokens);
   const totalCost = useBoundStore((s) => s.totalCost);
   const model = useBoundStore((s) => s.model);
+  const imageDetail = useBoundStore((s) => s.imageDetail);
   const images = useBoundStore((s) => s.images);
   const imageResults = useBoundStore((s) => s.imageResults);
   const requestsPerDay = useBoundStore((s) => s.requestsPerDay);
@@ -72,6 +73,7 @@ export default function ResultsPanel({ onOpenExplanation }) {
         sortOrder={sortOrder}
         toggleSort={toggleSort}
         onOpenExplanation={onOpenExplanation}
+        imageDetail={imageDetail}
       />
     );
   }
@@ -86,6 +88,7 @@ export default function ResultsPanel({ onOpenExplanation }) {
       requestsPerDay={requestsPerDay}
       setRequestsPerDay={setRequestsPerDay}
       onOpenExplanation={onOpenExplanation}
+      imageDetail={imageDetail}
     />
   );
 }
@@ -99,14 +102,15 @@ function SingleResults({
   requestsPerDay,
   setRequestsPerDay,
   onOpenExplanation,
+  imageDetail,
 }) {
   const copyFormats =
     totalTokens !== null
       ? {
           text: () =>
-            formatResultsAsText({ model, images, imageResults, totalTokens, totalCost, requestsPerDay }),
+            formatResultsAsText({ model, images, imageResults, totalTokens, totalCost, requestsPerDay, imageDetail }),
           table: () =>
-            formatResultsAsTsv({ model, images, imageResults, totalTokens, totalCost, requestsPerDay }),
+            formatResultsAsTsv({ model, images, imageResults, totalTokens, totalCost, requestsPerDay, imageDetail }),
         }
       : null;
 
@@ -143,6 +147,7 @@ function SingleResults({
         {model?.name && (
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mt: 1.5 }}>
             <Chip size="small" label={model.name} />
+            <Chip size="small" label={`${imageDetail === "original" ? "Original" : "High"} detail`} />
             <TokenBadge type={model.tokenizationType ?? "tile"} />
             <ModelComment comment={model.comment} />
             <RetirementChip date={model.retirementDate} />
@@ -197,12 +202,13 @@ function ComparisonResults({
   sortOrder,
   toggleSort,
   onOpenExplanation,
+  imageDetail,
 }) {
   const copyFormats =
     comparisonResults.length > 0
       ? {
-          text: () => formatComparisonAsText({ images, comparisonResults, requestsPerDay }),
-          table: () => formatComparisonAsTsv({ comparisonResults, requestsPerDay }),
+          text: () => formatComparisonAsText({ images, comparisonResults, requestsPerDay, imageDetail }),
+          table: () => formatComparisonAsTsv({ comparisonResults, requestsPerDay, imageDetail }),
         }
       : null;
 
@@ -243,6 +249,7 @@ function ComparisonResults({
         </Stack>
         <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mt: 1.5 }}>
           <Chip size="small" label={cheapest.model.name} color="success" variant="outlined" />
+          <Chip size="small" label={`${imageDetail === "original" ? "Original" : "High"} detail`} />
         </Stack>
       </Box>
 
@@ -322,10 +329,11 @@ function EmptyResults({ icon, message, onOpenExplanation }) {
 
 // Summary tables (reused from original)
 function TileSummary({ model, imageResults, totalTokens }) {
-  const totalTileTokens = totalTokens - (model?.baseTokens || 0);
   const totalTiles = imageResults
     .map((img) => img.tokenization?.totalTiles ?? 0)
     .reduce((acc, val) => acc + val, 0);
+  const totalTileTokens = totalTiles * model.tokensPerTile;
+  const totalBaseTokens = totalTokens - totalTileTokens;
 
   return (
     <TableContainer component={Paper} variant="outlined" sx={{ mb: 2 }}>
@@ -339,7 +347,7 @@ function TileSummary({ model, imageResults, totalTokens }) {
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>{model?.baseTokens}</TableCell>
+            <TableCell>{totalBaseTokens}</TableCell>
             <TableCell>{model?.tokensPerTile} &times; {totalTiles} = {totalTileTokens}</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>{totalTokens?.toLocaleString()}</TableCell>
           </TableRow>
