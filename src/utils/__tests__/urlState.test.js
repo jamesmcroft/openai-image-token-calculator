@@ -52,6 +52,16 @@ describe("encodeState and decodeState", () => {
     expect(result.images[0].preset).toBe("XGA");
     expect(result.images[1].preset).toBe("Custom");
     expect(result.requestsPerDay).toBe(1000);
+    expect(result.imageDetail).toBe("high");
+  });
+
+  it("round-trips Original detail in a shareable URL", () => {
+    const { hash } = encodeState({
+      modelName: "GPT-5.4 (Global)",
+      images: sampleImages,
+      imageDetail: "original",
+    }, testLocation);
+    expect(decodeState(hash).imageDetail).toBe("original");
   });
 
   it("omits requestsPerDay from hash when 0", () => {
@@ -163,6 +173,11 @@ describe("decodeState validation", () => {
     );
     const result = decodeState(`#${encoded}`);
     expect(result.error).toContain("images must be an array");
+  });
+
+  it("rejects unknown image detail in a URL", () => {
+    const encoded = btoa(JSON.stringify({ v: SCHEMA_VERSION, m: "test", i: [], d: "low" }));
+    expect(decodeState(`#${encoded}`).error).toContain("Unsupported image detail");
   });
 
   it("sanitizes negative dimensions to 0", () => {

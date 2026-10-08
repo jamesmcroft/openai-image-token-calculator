@@ -14,6 +14,9 @@ function resetStore() {
     imageResults: [],
     totalTokens: null,
     totalCost: null,
+    imageDetail: "high",
+    calculationError: null,
+    comparisonError: null,
   });
 }
 
@@ -49,6 +52,60 @@ const patchModelExpensive = {
 
 describe("ComparisonStore", () => {
   beforeEach(resetStore);
+
+  it("recalculates both modes when image detail changes", () => {
+    const s = useBoundStore.getState();
+    const supported = s.models.find((group) => group.name === "GPT-5.4").items[0];
+    s.setModel(supported);
+    s.addImage({ height: 4096, width: 4096, multiplier: 1 });
+    s.runCalculation();
+    expect(useBoundStore.getState().totalTokens).toBe(3000);
+
+    s.setImageDetail("original");
+    expect(useBoundStore.getState().totalTokens).toBe(12000);
+    s.setComparisonMode(true);
+    expect(useBoundStore.getState().comparisonResults[0].totalTokens).toBe(12000);
+    s.setImageDetail("high");
+    expect(useBoundStore.getState().comparisonResults[0].totalTokens).toBe(3000);
+  });
+
+  it("resets to High when switching to an unsupported model", () => {
+    const s = useBoundStore.getState();
+    const supported = s.models.find((group) => group.name === "GPT-5.4").items[0];
+    s.setModel(supported);
+    s.setImageDetail("original");
+    s.setModel(tileModel);
+    expect(useBoundStore.getState().imageDetail).toBe("high");
+    expect(() => s.setImageDetail("original")).toThrow(/not available/);
+  });
+
+  it("reports Original patch-limit errors rather than stale results", () => {
+    const s = useBoundStore.getState();
+    const model = s.models.find((group) => group.name === "GPT-5.6").items[0];
+    s.setModel(model);
+    s.addImage({ height: 8192, width: 8192, multiplier: 1 });
+    s.runCalculation();
+    expect(useBoundStore.getState().totalTokens).toBe(3000);
+    s.setImageDetail("original");
+    expect(useBoundStore.getState().totalTokens).toBeNull();
+    expect(useBoundStore.getState().calculationError).toMatch(/30,000-patch/);
+    s.setComparisonMode(true);
+    expect(useBoundStore.getState().comparisonResults).toEqual([]);
+    expect(useBoundStore.getState().comparisonError).toMatch(/30,000-patch/);
+    s.setImageDetail("high");
+    expect(useBoundStore.getState().comparisonError).toBeNull();
+    expect(useBoundStore.getState().comparisonResults[0].totalTokens).toBe(3000);
+  });
+
+  it("switches comparison to High when adding a model without Original support", () => {
+    const s = useBoundStore.getState();
+    const supported = s.models.find((group) => group.name === "GPT-5.4").items[0];
+    s.setComparisonMode(true);
+    s.toggleModelSelection(supported);
+    s.setImageDetail("original");
+    s.toggleModelSelection(tileModel);
+    expect(useBoundStore.getState().imageDetail).toBe("high");
+  });
 
   // -----------------------------------------------------------------------
   // setComparisonMode

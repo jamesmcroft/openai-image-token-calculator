@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { useBoundStore } from "../stores";
 import { encodeState, decodeState, findModelByName } from "../utils/urlState";
+import { getOriginalDetail } from "../stores/ModelStore";
 
 const DEBOUNCE_MS = 300;
 
@@ -21,6 +22,8 @@ export default function useUrlState({ setModelName }) {
   const addImage = useBoundStore((s) => s.addImage);
   const clearImages = useBoundStore((s) => s.clearImages);
   const setRequestsPerDay = useBoundStore((s) => s.setRequestsPerDay);
+  const imageDetail = useBoundStore((s) => s.imageDetail);
+  const setImageDetail = useBoundStore((s) => s.setImageDetail);
   const comparisonMode = useBoundStore((s) => s.comparisonMode);
   const setComparisonMode = useBoundStore((s) => s.setComparisonMode);
   const selectedModels = useBoundStore((s) => s.selectedModels);
@@ -84,16 +87,31 @@ export default function useUrlState({ setModelName }) {
       if (missingModels.length > 0) {
         setWarning(`Some models were not found: ${missingModels.join(", ")}. They may have been renamed or removed.`);
       }
+      const selected = useBoundStore.getState().selectedModels;
+      if (result.imageDetail === "original" && selected.length > 0 &&
+        selected.every((item) => getOriginalDetail(item))) {
+        setImageDetail("original");
+      } else if (result.imageDetail === "original") {
+        setWarning("Original detail is not supported by all selected models; using High.");
+      }
       setTimeout(() => {
         useBoundStore.getState().runComparison();
         hydratedRef.current = true;
       }, 0);
     } else if (modelObj && result.images.length > 0) {
+      if (result.imageDetail === "original" && getOriginalDetail(modelObj)) {
+        setImageDetail("original");
+      } else if (result.imageDetail === "original") {
+        setWarning("Original detail is not supported by this model; using High.");
+      }
       setTimeout(() => {
         useBoundStore.getState().runCalculation();
         hydratedRef.current = true;
       }, 0);
     } else {
+      if (result.imageDetail === "original" && modelObj && getOriginalDetail(modelObj)) {
+        setImageDetail("original");
+      }
       hydratedRef.current = true;
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -135,6 +153,7 @@ export default function useUrlState({ setModelName }) {
       requestsPerDay,
       comparisonMode,
       selectedModelNames: selectedModels.map((m) => m.name),
+      imageDetail,
     });
 
     setOversized(isOversized);
@@ -143,7 +162,7 @@ export default function useUrlState({ setModelName }) {
       const basePath = `${window.location.pathname}${window.location.search}`;
       history.replaceState(null, "", `${basePath}${hash}`);
     }
-  }, [model, images, requestsPerDay, comparisonMode, selectedModels]);
+  }, [model, images, requestsPerDay, comparisonMode, selectedModels, imageDetail]);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);

@@ -6,12 +6,15 @@ import {
   Stack,
 } from "@mui/material";
 import { useBoundStore } from "../../stores";
+import { getOriginalDetail } from "../../stores/ModelStore";
 
 export default function CalculationExplanation() {
   const model = useBoundStore((s) => s.model);
   const comparisonMode = useBoundStore((s) => s.comparisonMode);
   const comparisonResults = useBoundStore((s) => s.comparisonResults);
+  const imageDetail = useBoundStore((s) => s.imageDetail);
   const isPatch = model?.tokenizationType === "patch";
+  const detailLimits = imageDetail === "original" ? getOriginalDetail(model) : null;
 
   return (
     <Accordion
@@ -41,7 +44,7 @@ export default function CalculationExplanation() {
               </Typography>
               <Typography>
                 <b>Patch-based models</b> (GPT-5.2+, GPT-5.4, o4-mini): Images
-                are covered with patches and constrained by a patch budget.
+                are covered with patches and constrained by the selected detail limits.
                 Tokens = patches x token multiplier.
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -59,7 +62,7 @@ export default function CalculationExplanation() {
             <Stack spacing={1.25} component="ol" sx={{ pl: 2 }}>
               <Typography component="li">
                 <b>Max Dimension Check</b>: If any side exceeds{" "}
-                {model.maxImageDimension}px, the image is scaled down
+                {(detailLimits ?? model).maxImageDimension}px, the image is scaled down
                 proportionally to fit.
               </Typography>
               <Typography component="li">
@@ -69,8 +72,9 @@ export default function CalculationExplanation() {
                 ceil(height/{model.patchSize}).
               </Typography>
               <Typography component="li">
-                <b>Patch Budget</b>: If patches exceed {model.patchBudget}, the
-                image is scaled down further to fit within the budget.
+                <b>Patch Budget</b>: {detailLimits?.patchBudget === null
+                  ? "Original detail does not resize to a patch budget; images exceeding 30,000 patches are rejected."
+                  : `If patches exceed ${(detailLimits ?? model).patchBudget}, the image is scaled down further to fit within the budget.`}
               </Typography>
               <Typography component="li">
                 <b>Token Calculation</b>: Total tokens = patches &times;{" "}
@@ -89,10 +93,10 @@ export default function CalculationExplanation() {
           ) : (
             <Stack spacing={1.25} component="ol" sx={{ pl: 2 }}>
               <Typography component="li">
-                <b>Resizing Images</b>: Ensure each image is resized to fit within
-                the maximum dimension {model.maxImageDimension}px and has at least{" "}
-                {model.imageMinSizeLength}px on its shortest side while
-                maintaining its aspect ratio.
+                <b>Resizing Images</b>: Fit within {model.maxImageDimension}px
+                maximum dimension, then scale the shortest side down to{" "}
+                {model.imageMinSizeLength}px if it exceeds that size. Smaller
+                images are not enlarged.
               </Typography>
               <Typography component="li">
                 <b>Calculating Tiles</b>: The resized image is divided into tiles
@@ -101,7 +105,7 @@ export default function CalculationExplanation() {
               </Typography>
               <Typography component="li">
                 <b>Token Calculation</b>: Total tokens = (tiles &times;
-                {model.tokensPerTile}) + {model.baseTokens} base tokens.
+                {model.tokensPerTile} + {model.baseTokens} base tokens) &times; quantity.
               </Typography>
               <Typography component="li">
                 <b>Price Calculation</b>: Total price = total tokens &times; price per

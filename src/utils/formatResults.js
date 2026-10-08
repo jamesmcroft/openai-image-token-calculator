@@ -11,7 +11,7 @@ const currencyFormat = new Intl.NumberFormat(undefined, {
  * Build a plain-text summary of the calculation results suitable for
  * pasting into documents, messages, or cost analyses.
  *
- * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number, requestsPerDay?: number }} params
+ * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number, requestsPerDay?: number, imageDetail?: string }} params
  * @returns {string}
  */
 export function formatResultsAsText({
@@ -21,6 +21,7 @@ export function formatResultsAsText({
   totalTokens,
   totalCost,
   requestsPerDay,
+  imageDetail,
 }) {
   const isPatch = model?.tokenizationType === "patch";
   const lines = ["Azure OpenAI Image Token Calculator"];
@@ -28,6 +29,7 @@ export function formatResultsAsText({
   // Model header
   const tokenLabel = isPatch ? "Patch-based" : "Tile-based";
   lines.push(`Model: ${model?.name ?? "Unknown"} [${tokenLabel}]`);
+  if (imageDetail) lines.push(`Image detail: ${imageDetail === "original" ? "Original" : "High"}`);
 
   if (model?.retirementDate) {
     lines.push(`Note: This model retires ${model.retirementDate}`);
@@ -104,14 +106,15 @@ export function formatResultsAsText({
  * Build a plain-text comparison table of multiple model results suitable
  * for pasting into documents, messages, or cost analyses.
  *
- * @param {{ images: object[], comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[], requestsPerDay?: number }} params
+ * @param {{ images: object[], comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[], requestsPerDay?: number, imageDetail?: string }} params
  * @returns {string}
  */
-export function formatComparisonAsText({ images, comparisonResults, requestsPerDay }) {
+export function formatComparisonAsText({ images, comparisonResults, requestsPerDay, imageDetail }) {
   const lines = [
     "Azure OpenAI Image Token Calculator - Model Comparison",
     "",
   ];
+  if (imageDetail) lines.splice(1, 0, `Image detail: ${imageDetail === "original" ? "Original" : "High"}`);
 
   // Image summary
   const validImages = (images ?? []).filter(
@@ -209,7 +212,7 @@ export function formatComparisonAsText({ images, comparisonResults, requestsPerD
  * Build a TSV (tab-separated values) version of single-model results
  * that pastes cleanly into spreadsheet applications.
  *
- * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number, requestsPerDay?: number }} params
+ * @param {{ model: object, images: object[], imageResults: object[], totalTokens: number, totalCost: string|number, requestsPerDay?: number, imageDetail?: string }} params
  * @returns {string}
  */
 export function formatResultsAsTsv({
@@ -219,6 +222,7 @@ export function formatResultsAsTsv({
   totalTokens,
   totalCost,
   requestsPerDay,
+  imageDetail,
 }) {
   const isPatch = model?.tokenizationType === "patch";
   const unitLabel = isPatch ? "Patches" : "Tiles";
@@ -266,6 +270,7 @@ export function formatResultsAsTsv({
   if (model?.name) {
     rows.push(["Model", model.name].join("\t"));
   }
+  if (imageDetail) rows.push(["Image detail", imageDetail === "original" ? "Original" : "High"].join("\t"));
 
   // Cost projection (only when requestsPerDay > 0 and cost is positive)
   const unitCost = Number.parseFloat(totalCost ?? "0");
@@ -285,14 +290,15 @@ export function formatResultsAsTsv({
  * Build a TSV (tab-separated values) version of comparison results
  * that pastes cleanly into spreadsheet applications.
  *
- * @param {{ comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[], requestsPerDay?: number }} params
+ * @param {{ comparisonResults: { model: object, totalTokens: number, totalCost: string|number, imageResults: object[] }[], requestsPerDay?: number, imageDetail?: string }} params
  * @returns {string}
  */
-export function formatComparisonAsTsv({ comparisonResults, requestsPerDay }) {
+export function formatComparisonAsTsv({ comparisonResults, requestsPerDay, imageDetail }) {
   const hasProjection = requestsPerDay > 0;
   const rows = [];
 
   const headers = ["Model", "Type", "Total Tokens", "Estimated Cost", "Rate", "Retirement"];
+  if (imageDetail) headers.push("Image Detail");
   if (hasProjection) {
     headers.push("Daily Cost", "Monthly Cost (30d)");
   }
@@ -312,6 +318,7 @@ export function formatComparisonAsTsv({ comparisonResults, requestsPerDay }) {
     const retirement = r.model?.retirementDate ?? "";
 
     const cols = [name, tokenType, tokens, cost, rate, retirement];
+    if (imageDetail) cols.push(imageDetail === "original" ? "Original" : "High");
     if (hasProjection) {
       const unitCost = Number.parseFloat(r.totalCost ?? "0");
       const valid = Number.isFinite(unitCost) && unitCost > 0;

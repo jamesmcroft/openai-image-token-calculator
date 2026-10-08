@@ -245,6 +245,10 @@ export default function ModelPicker({ modelName, setModelName }) {
           </Grid>
         )}
       </Collapse>
+      <Typography variant="caption" color="text.secondary">
+        Vision estimates default to High detail; choose Original when supported.
+        Image Gen input counts are approximations.
+      </Typography>
     </Box>
   );
 }

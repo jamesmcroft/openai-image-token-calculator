@@ -1,12 +1,37 @@
+import { getOriginalDetail } from "./ModelStore";
+
 export const calcStore = (set, get) => ({
   model: "",
+  imageDetail: "high",
+  calculationError: null,
   images: [],
   imageResults: [],
   totalTokens: null,
   totalCost: null,
   requestsPerDay: 0,
 
-  setModel: (model) => set({ model }),
+  setModel: (model) => set({
+    model,
+    imageDetail: get().imageDetail === "original" && model && !getOriginalDetail(model)
+      ? "high"
+      : get().imageDetail,
+    calculationError: null,
+  }),
+  setImageDetail: (detail) => {
+    if (detail !== "high" && detail !== "original") {
+      throw new RangeError(`Unsupported image detail: ${detail}`);
+    }
+    const { model, selectedModels, comparisonMode } = get();
+    if (detail === "original" &&
+      (comparisonMode
+        ? selectedModels.length === 0 || selectedModels.some((item) => !getOriginalDetail(item))
+        : !getOriginalDetail(model))) {
+      throw new RangeError("Original detail is not available for the selected models");
+    }
+    set({ imageDetail: detail, calculationError: null });
+    if (comparisonMode) get().runComparison();
+    else if (model && typeof model === "object") get().runCalculation();
+  },
 
   setRequestsPerDay: (value) => {
     const parsed = Math.trunc(Number(value));
@@ -26,12 +51,22 @@ export const calcStore = (set, get) => ({
   },
 
   resetCalculation: () => {
-    set(() => ({ imageResults: [], totalTokens: null, totalCost: null }));
+    set(() => ({ imageResults: [], totalTokens: null, totalCost: null, calculationError: null }));
   },
   runCalculation: () => {
-    const { model, images } = get();
-    const { totalTokens, totalCost, imageResults } = calculateForModel(model, images);
-    set(() => ({ imageResults, totalTokens, totalCost }));
+    const { model, images, imageDetail } = get();
+    try {
+      const { totalTokens, totalCost, imageResults } = calculateForModel(model, images, imageDetail);
+      set(() => ({ imageResults, totalTokens, totalCost, calculationError: null }));
+    } catch (error) {
+      if (!(error instanceof RangeError)) throw error;
+      set(() => ({
+        imageResults: [],
+        totalTokens: null,
+        totalCost: null,
+        calculationError: error.message,
+      }));
+    }
   },
 });
 
@@ -57,8 +92,8 @@ function getResizedImageSize(maxDimension, minSide, height, width) {
   }
 
   return {
-    height: Math.round(resizedHeight),
-    width: Math.round(resizedWidth),
+    height: Math.floor(resizedHeight),
+    width: Math.floor(resizedWidth),
   };
 }
 
@@ -76,7 +111,9 @@ function calculateTileBased(model, images) {
     const tilesHigh = Math.ceil(imgSize.height / tileSizeLength);
     const tilesWide = Math.ceil(imgSize.width / tileSizeLength);
     const totalTiles = tilesHigh * tilesWide * image.multiplier;
-    const imageTokens = tilesHigh * tilesWide * tokensPerTile * image.multiplier + baseTokens;
+    const imageTokens = imgSize.height > 0 && imgSize.width > 0
+      ? (tilesHigh * tilesWide * tokensPerTile + baseTokens) * image.multiplier
+      : 0;
 
     return {
       resizedHeight: imgSize.height,
@@ -95,7 +132,7 @@ function calculateTileBased(model, images) {
 }
 
 // --- Patch-based tokenization (GPT-5.2+, GPT-5.4, o4-mini, etc.) ---
-// Source: https://developers.openai.com/api/docs/guides/vision#patch-based-image-tokenization
+// Source: https://developers.openai.com/api/docs/guides/images-vision#calculating-costs
 
 function getPatchCount(patchSize, height, width) {
   if (width <= 0 || height <= 0) return 0;
@@ -131,8 +168,14 @@ function resizeForPatchBudget(patchSize, patchBudget, height, width) {
   return { height: resizedHeight, width: resizedWidth, patches };
 }
 
-function calculatePatchBased(model, images) {
-  const { patchSize, patchBudget, tokenMultiplier, maxImageDimension } = model;
+function calculatePatchBased(model, images, detail = "high") {
+  const originalLimits = detail === "original" ? getOriginalDetail(model) : null;
+  if (detail !== "high" && !originalLimits) {
+    throw new RangeError(`Original detail is not available for ${model.name}`);
+  }
+  const { patchSize, tokenMultiplier } = model;
+  const maxImageDimension = originalLimits?.maxImageDimension ?? model.maxImageDimension;
+  const patchBudget = originalLimits ? originalLimits.patchBudget : model.patchBudget;
 
   return images.map((image) => {
     let w = image.width;
@@ -161,7 +204,12 @@ function calculatePatchBased(model, images) {
     }
 
     // Step 2: Check patch budget and resize if needed
-    const result = resizeForPatchBudget(patchSize, patchBudget, h, w);
+    const result = patchBudget === null
+      ? { height: h, width: w, patches: getPatchCount(patchSize, h, w) }
+      : resizeForPatchBudget(patchSize, patchBudget, h, w);
+    if (result.patches > 30000) {
+      throw new RangeError(`${model.name}: ${image.width} x ${image.height} exceeds the 30,000-patch Original detail limit`);
+    }
 
     const patchesWide = Math.ceil(result.width / patchSize);
     const patchesHigh = Math.ceil(result.height / patchSize);
@@ -184,12 +232,18 @@ function calculatePatchBased(model, images) {
   });
 }
 
-function calculateForModel(model, images) {
+function calculateForModel(model, images, detail = "high") {
+  if (detail !== "high" && detail !== "original") {
+    throw new RangeError(`Unsupported image detail: ${detail}`);
+  }
   const tokenizationType = model.tokenizationType ?? "tile";
+  if (detail === "original" && !getOriginalDetail(model)) {
+    throw new RangeError(`Original detail is not available for ${model.name}`);
+  }
 
   const imageResults =
     tokenizationType === "patch"
-      ? calculatePatchBased(model, images)
+      ? calculatePatchBased(model, images, detail)
       : calculateTileBased(model, images);
 
   const totalTokens = imageResults.reduce(

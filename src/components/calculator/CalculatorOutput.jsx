@@ -214,10 +214,11 @@ function ImageBreakdownList({ imageResults, isPatch }) {
 }
 
 function TileSummary({ model, imageResults, totalTokens, currency }) {
-  const totalTileTokens = totalTokens - (model?.baseTokens || 0);
   const totalTiles = imageResults
     .map((img) => img.tokenization?.totalTiles ?? 0)
     .reduce((acc, val) => acc + val, 0);
+  const totalTileTokens = totalTiles * model.tokensPerTile;
+  const totalBaseTokens = totalTokens - totalTileTokens;
 
   return (
     <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
@@ -232,7 +233,7 @@ function TileSummary({ model, imageResults, totalTokens, currency }) {
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>{model?.baseTokens}</TableCell>
+            <TableCell>{totalBaseTokens}</TableCell>
             <TableCell>
               {model?.tokensPerTile} &times; {totalTiles} = {totalTileTokens}
             </TableCell>
